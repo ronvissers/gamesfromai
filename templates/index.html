@@ -29,55 +29,113 @@
     </div>
 </section>
 
-<section class="game-grid" id="games">
-    <a href="/zeeslag" class="game-card">
+<!-- Category filter -->
+<section class="category-bar" id="games">
+    <button class="cat-btn active" data-cat="all" data-i18n="cat-all">🎮 Alle</button>
+    <button class="cat-btn" data-cat="arcade" data-i18n="cat-arcade">🎯 Arcade</button>
+    <button class="cat-btn" data-cat="puzzel" data-i18n="cat-puzzel">🧩 Puzzel</button>
+    <button class="cat-btn" data-cat="bordspel" data-i18n="cat-bordspel">🎲 Bordspel</button>
+    <button class="cat-btn" data-cat="strategie" data-i18n="cat-strategie">🪖 Strategie</button>
+</section>
+
+<section class="game-grid">
+    <a href="/zeeslag" class="game-card" data-category="bordspel strategie">
         <span class="emoji">🚢</span>
         <h3 data-i18n="card-zeeslag-title">Zeeslag</h3>
         <p data-i18n="card-zeeslag-desc">Klassiek zeeslag op een raster van 10×10. Zoek en vernietig alle schepen van de tegenstander met strategisch mikken.</p>
         <span class="tag" data-i18n="card-zeeslag-tag">Bordspel · Strategie</span>
     </a>
 
-    <a href="/tank-game" class="game-card">
+    <a href="/tank-game" class="game-card" data-category="strategie">
         <span class="emoji">🪖</span>
         <h3 data-i18n="card-tank-title">Pocket Tank</h3>
         <p data-i18n="card-tank-desc">Twee tanks, één doel. Kies je wapen, mik en vuur in dit tactische artillerie-duel.</p>
         <span class="tag" data-i18n="card-tank-tag">Strategie · Artillerie</span>
     </a>
 
-    <a href="/tetris" class="game-card">
+    <a href="/tetris" class="game-card" data-category="puzzel arcade">
         <span class="emoji">🧱</span>
         <h3 data-i18n="card-tetris-title">Tetris</h3>
         <p data-i18n="card-tetris-desc">De tijdloze puzzelklassieker. Draai en plaats vallende blokken om volledige lijnen te maken.</p>
         <span class="tag" data-i18n="card-tetris-tag">Puzzel · Arcade</span>
     </a>
 
-    <a href="/boter-kaas-eieren" class="game-card">
+    <a href="/boter-kaas-eieren" class="game-card" data-category="bordspel">
         <span class="emoji">❌</span>
         <h3 data-i18n="card-boter-title">Boter, Kaas & Eieren</h3>
         <p data-i18n="card-boter-desc">Het klassieke bordspel met ✕ en ○. Speel tegen elkaar of tegen een onverslaanbare AI.</p>
         <span class="tag" data-i18n="card-boter-tag">Bordspel · Twee spelers</span>
     </a>
 
-    <a href="/snake" class="game-card">
+    <a href="/snake" class="game-card" data-category="arcade">
         <span class="emoji">🐍</span>
         <h3 data-i18n="card-snake-title">Snake</h3>
         <p data-i18n="card-snake-desc">De klassieke slang. Eet appels, word langer, maar raak niet jezelf of de muur!</p>
         <span class="tag" data-i18n="card-snake-tag">Arcade · Retro</span>
     </a>
 
-    <a href="/2048" class="game-card">
+    <a href="/2048" class="game-card" data-category="puzzel">
         <span class="emoji">🔢</span>
         <h3 data-i18n="card-2048-title">2048</h3>
         <p data-i18n="card-2048-desc">Schuif tegels, combineer ze en probeer de 2048 tegel te bereiken!</p>
         <span class="tag" data-i18n="card-2048-tag">Puzzel · Cijfers</span>
     </a>
 
-    <a href="/space-invaders" class="game-card">
+    <a href="/space-invaders" class="game-card" data-category="arcade">
         <span class="emoji">👾</span>
         <h3 data-i18n="card-space-title">Space Invaders</h3>
         <p data-i18n="card-space-desc">De klassieke arcade-shooter. Vernietig golven aliens en verdedig de aarde in dit tijdloze spel.</p>
         <span class="tag" data-i18n="card-space-tag">Arcade · Shooter</span>
     </a>
 </section>
+
+<script>
+// === Category filter + random 6 on homepage ===
+(function() {
+    const grid = document.querySelector('.game-grid');
+    const cards = Array.from(document.querySelectorAll('.game-card'));
+    const catBtns = document.querySelectorAll('.cat-btn');
+    const MAX_HOME = 6;
+    let activeCat = 'all';
+    let isFiltered = false;
+
+    function shuffle(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    function showCards(category) {
+        cards.forEach(c => c.style.display = 'none');
+
+        let visible = cards.filter(c => {
+            if (category === 'all') return true;
+            return c.dataset.category && c.dataset.category.includes(category);
+        });
+
+        // Only limit to 6 when "Alle" is selected and not filtered by category click
+        if (category === 'all' && !isFiltered) {
+            visible = shuffle(visible).slice(0, MAX_HOME);
+        }
+
+        visible.forEach(c => c.style.display = '');
+    }
+
+    catBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            catBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            activeCat = btn.dataset.cat;
+            isFiltered = true;
+            showCards(activeCat);
+        });
+    });
+
+    // Initial: show 6 random cards
+    showCards('all');
+})();
+</script>
 
 {% endblock %}

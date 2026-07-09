@@ -15,6 +15,13 @@ const i18n = {
         "nav-snake": "🐍 Snake",
         "nav-2048": "🔢 2048",
 
+        // Categories
+        "cat-all": "🎮 Alle",
+        "cat-arcade": "🎯 Arcade",
+        "cat-puzzel": "🧩 Puzzel",
+        "cat-bordspel": "🎲 Bordspel",
+        "cat-strategie": "🪖 Strategie",
+
         // Hero
         "hero-title": "Klassiekers, opnieuw gemaakt",
         "hero-sub": "Zeeslag, Pocket Tank en Tetris — volledig opnieuw gebouwd door AI.",
@@ -205,6 +212,13 @@ const i18n = {
         "nav-space": "👾 Space Invaders",
         "nav-snake": "🐍 Snake",
         "nav-2048": "🔢 2048",
+
+        // Categories
+        "cat-all": "🎮 All",
+        "cat-arcade": "🎯 Arcade",
+        "cat-puzzel": "🧩 Puzzle",
+        "cat-bordspel": "🎲 Board Game",
+        "cat-strategie": "🪖 Strategy",
 
         // Hero
         "hero-title": "Classics, rebuilt",
