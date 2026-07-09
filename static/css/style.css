@@ -78,7 +78,7 @@ body {
 .nav-cats {
     display: flex;
     gap: 6px;
-    padding: 4px 16px 10px;
+    padding: 4px 0 10px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
