@@ -139,6 +139,12 @@
         isFiltered = true;
         setActiveCat(urlCat);
         showCards(urlCat);
+        // Scroll naar games na korte pauze voor render
+        setTimeout(() => {
+            if (grid) {
+                grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }, 100);
     } else {
         // Initial: show 6 random cards
         showCards('all');
