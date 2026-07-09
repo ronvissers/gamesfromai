@@ -106,7 +106,6 @@
             return c.dataset.category && c.dataset.category.includes(category);
         });
 
-        // Only limit to 6 when "Alle" is selected and not filtered by category click
         if (category === 'all' && !isFiltered) {
             visible = shuffle(visible).slice(0, MAX_HOME);
         }
@@ -114,18 +113,36 @@
         visible.forEach(c => c.style.display = '');
     }
 
+    function setActiveCat(cat) {
+        catBtns.forEach(b => b.classList.remove('active'));
+        catBtns.forEach(b => { if (b.dataset.cat === cat) b.classList.add('active'); });
+    }
+
     catBtns.forEach(btn => {
         btn.addEventListener('click', () => {
-            catBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            activeCat = btn.dataset.cat;
+            const cat = btn.dataset.cat;
+            activeCat = cat;
             isFiltered = true;
-            showCards(activeCat);
+            setActiveCat(cat);
+            showCards(cat);
+            // Scroll naar games
+            if (grid) {
+                grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         });
     });
 
-    // Initial: show 6 random cards
-    showCards('all');
+    // Check URL parameter ?cat=xxx
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlCat = urlParams.get('cat');
+    if (urlCat) {
+        isFiltered = true;
+        setActiveCat(urlCat);
+        showCards(urlCat);
+    } else {
+        // Initial: show 6 random cards
+        showCards('all');
+    }
 })();
 </script>
 

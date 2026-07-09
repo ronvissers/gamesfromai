@@ -226,5 +226,17 @@
             }
         });
     </script>
+    <script>
+        // === Category buttons: navigate to homepage with filter ===
+        document.querySelectorAll('.nav-cats .cat-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const isHome = window.location.pathname === '/' || window.location.pathname === '';
+                if (!isHome) {
+                    e.preventDefault();
+                    window.location.href = '/?cat=' + btn.dataset.cat;
+                }
+            });
+        });
+    </script>
 </body>
 </html>
