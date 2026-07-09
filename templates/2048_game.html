@@ -1,13 +1,32 @@
 {% extends "base.html" %}
 {% block title %}2048 — GamesFromAI{% endblock %}
 {% block content %}
-<section class=\"game-page\"> 
-  <div class=\"container\">
-    <h1>2048</h1>
-    <p class=\"game-meta\" data-i18n=\"meta-classic\">Klassieke puzzel — lokaal gegenereerd door AI</p>
-    <div class=\"game-area\" style=\"padding:0; text-align:center;\">
-      <iframe src=\"/static/games/2048.html\" style=\"width:100%;max-width:680px;height:520px;border:none;\" title=\"2048\"></iframe>
+<section class="game-page">
+    <div class="container">
+        <h1>🔢 <span data-i18n="card-2048-title">2048</span></h1>
+        <p class="game-meta" data-i18n="meta-classic">De klassieker — opnieuw gemaakt door AI</p>
+
+        <div class="game-explanation">
+            <h2 data-i18n="2048-uitleg-title">📖 Uitleg</h2>
+            <p data-i18n="2048-uitleg-p1">2048 is een populaire puzzelgame. Schuif tegels over het bord, combineer gelijke nummers en probeer de 2048 tegel te bereiken!</p>
+
+            <h3 data-i18n="2048-uitleg-h1">🎮 Besturing</h3>
+            <ul>
+                <li data-i18n="2048-uitleg-h1i1">↑ ↓ ← — Tegels schuiven met pijltjestoetsen</li>
+                <li data-i18n="2048-uitleg-h1i2">R — Opnieuw starten</li>
+            </ul>
+
+            <h3 data-i18n="2048-uitleg-h2">💡 Tip</h3>
+            <p data-i18n="2048-uitleg-h3p">Probeer je hoogste tegel in één hoek te houden en werk vanuit daar. Schuif niet te vaak in alle richtingen!</p>
+
+            <p style="margin-top: 16px; font-size: 0.85rem; color: var(--text-muted);" data-i18n="2048-uitleg-footer">
+                🤖 Dit spel is gegenereerd door AI.
+            </p>
+        </div>
+
+        <div class="game-area" style="padding:0; text-align:center;">
+            <iframe src="/static/games/2048.html" style="width:100%;max-width:680px;height:520px;border:none;margin:0 auto;" title="2048"></iframe>
+        </div>
     </div>
-  </div>
 </section>
 {% endblock %}

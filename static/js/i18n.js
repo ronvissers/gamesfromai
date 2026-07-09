@@ -12,6 +12,8 @@ const i18n = {
         "nav-tetris": "🧱 Tetris",
         "nav-boter": "❌ Boter, Kaas & Eieren",
         "nav-space": "👾 Space Invaders",
+        "nav-snake": "🐍 Snake",
+        "nav-2048": "🔢 2048",
 
         // Hero
         "hero-title": "Klassiekers, opnieuw gemaakt",
@@ -45,6 +47,16 @@ const i18n = {
         "card-space-title": "👾 Space Invaders",
         "card-space-desc": "De klassieke arcade-shooter. Vernietig golven aliens en verdedig de aarde in dit tijdloze spel.",
         "card-space-tag": "Arcade · Shooter",
+
+        // Snake card
+        "card-snake-title": "🐍 Snake",
+        "card-snake-desc": "De klassieke slang. Eet appels, word langer, maar raak niet jezelf of de muur!",
+        "card-snake-tag": "Arcade · Retro",
+
+        // 2048 card
+        "card-2048-title": "🔢 2048",
+        "card-2048-desc": "Schuif tegels, combineer ze en probeer de 2048 tegel te bereiken!",
+        "card-2048-tag": "Puzzel · Cijfers",
 
         // Game pages - meta
         "meta-classic": "De klassieker — opnieuw gemaakt door AI",
@@ -191,6 +203,8 @@ const i18n = {
         "nav-tetris": "🧱 Tetris",
         "nav-boter": "❌ Tic-Tac-Toe",
         "nav-space": "👾 Space Invaders",
+        "nav-snake": "🐍 Snake",
+        "nav-2048": "🔢 2048",
 
         // Hero
         "hero-title": "Classics, rebuilt",
@@ -224,6 +238,16 @@ const i18n = {
         "card-space-title": "👾 Space Invaders",
         "card-space-desc": "The classic arcade shooter. Destroy waves of aliens and defend Earth in this timeless game.",
         "card-space-tag": "Arcade · Shooter",
+
+        // Snake card
+        "card-snake-title": "🐍 Snake",
+        "card-snake-desc": "The classic snake game. Eat apples, grow longer, but don't hit yourself or the wall!",
+        "card-snake-tag": "Arcade · Retro",
+
+        // 2048 card
+        "card-2048-title": "🔢 2048",
+        "card-2048-desc": "Slide tiles, combine them and try to reach the 2048 tile!",
+        "card-2048-tag": "Puzzle · Numbers",
 
         // Game pages - meta
         "meta-classic": "The classic — rebuilt by AI",

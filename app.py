@@ -22,6 +22,14 @@ def tetris():
 def boter_kaas_eieren():
     return render_template('boter_kaas_eieren.html')
 
+@app.route('/snake')
+def snake():
+    return render_template('snake_game.html')
+
+@app.route('/2048')
+def game2048():
+    return render_template('2048_game.html')
+
 @app.route('/space-invaders')
 def space_invaders():
     return render_template('space_invaders.html')
@@ -37,6 +45,8 @@ def sitemap():
         ('/zeeslag', '2026-07-05', '0.9'),
         ('/tank-game', '2026-07-05', '0.9'),
         ('/tetris', '2026-07-05', '0.9'),
+        ('/snake', '2026-07-09', '0.9'),
+        ('/2048', '2026-07-09', '0.9'),
         ('/boter-kaas-eieren', '2026-07-05', '0.9'),
         ('/space-invaders', '2026-07-07', '0.9'),
         ('/cookiebeleid', '2026-07-05', '0.5'),

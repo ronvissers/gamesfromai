@@ -2,12 +2,31 @@
 {% block title %}Snake — GamesFromAI{% endblock %}
 {% block content %}
 <section class="game-page">
-  <div class="container">
-    <h1>🐍 Snake</h1>
-    <p class="game-meta" data-i18n="meta-classic">Klassieke slang game — lokaal gegenereerd door AI</p>
-    <div class="game-area" style="padding:0; text-align:center;">
-      <iframe src="/static/games/snake.html" style="width:100%;max-width:680px;height:520px;border:none;margin:0 auto;" title="Snake"></iframe>
+    <div class="container">
+        <h1>🐍 <span data-i18n="card-snake-title">Snake</span></h1>
+        <p class="game-meta" data-i18n="meta-classic">De klassieker — opnieuw gemaakt door AI</p>
+
+        <div class="game-explanation">
+            <h2 data-i18n="snake-uitleg-title">📖 Uitleg</h2>
+            <p data-i18n="snake-uitleg-p1">Snake is een van de oudste en bekendste arcade-games. Bestuur een slang die appels eet en steeds langer wordt. Raak niet de muur of je eigen staart!</p>
+
+            <h3 data-i18n="snake-uitleg-h1">🎮 Besturing</h3>
+            <ul>
+                <li data-i18n="snake-uitleg-h1i1">↑ ↓ ← → — Slang besturen</li>
+                <li data-i18n="snake-uitleg-h1i2">Spatie — Pauzeren / Hervatten</li>
+            </ul>
+
+            <h3 data-i18n="snake-uitleg-h2">💡 Tip</h3>
+            <p data-i18n="snake-uitleg-h3p">Probeer een patroon te rijden zodat je niet in je eigen staart vastloopt. Hoe langer de slang, hoe lastiger!</p>
+
+            <p style="margin-top: 16px; font-size: 0.85rem; color: var(--text-muted);" data-i18n="snake-uitleg-footer">
+                🤖 Dit spel is gegenereerd door AI.
+            </p>
+        </div>
+
+        <div class="game-area" style="padding:0; text-align:center;">
+            <iframe src="/static/games/snake.html" style="width:100%;max-width:680px;height:520px;border:none;margin:0 auto;" title="Snake"></iframe>
+        </div>
     </div>
-  </div>
 </section>
 {% endblock %}
