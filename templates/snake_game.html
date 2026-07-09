@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Snake — GamesFromAI{% endblock %}
+{% block content %}
+<section class="game-page">
+  <div class="container">
+    <h1>🐍 Snake</h1>
+    <p class="game-meta" data-i18n="meta-classic">Klassieke slang game — lokaal gegenereerd door AI</p>
+    <div class="game-area" style="padding:0; text-align:center;">
+      <iframe src="/static/games/snake.html" style="width:100%;max-width:680px;height:520px;border:none;margin:0 auto;" title="Snake"></iframe>
+    </div>
+  </div>
+</section>
+{% endblock %}

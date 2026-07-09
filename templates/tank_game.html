@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Pocket Tank — GamesFromAI{% endblock %}
+{% block content %}
+
+<section class="game-page">
+    <div class="container">
+        <h1>🪖 <span data-i18n="card-tank-title">Pocket Tank</span></h1>
+        <p class="game-meta" data-i18n="meta-classic">De klassieker — opnieuw gemaakt door AI</p>
+
+        <div class="game-explanation">
+            <h2 data-i18n="tank-uitleg-title">📖 Uitleg</h2>
+            <p data-i18n="tank-uitleg-p1">Pocket Tank is een actiespel van precisie en strategie. Twee tanks staan tegenover elkaar op een willekeurig gegenereerd terrein. Kies je wapen, mik goed en pas je schot aan op de wind!</p>
+
+            <h3 data-i18n="tank-uitleg-h1">🎮 Besturing</h3>
+            <ul>
+                <li data-i18n="tank-uitleg-h1i1">← → — Hoek aanpassen</li>
+                <li data-i18n="tank-uitleg-h1i2">↑ ↓ — Kracht aanpassen</li>
+                <li data-i18n="tank-uitleg-h1i3">Spatie — Schieten</li>
+                <li data-i18n="tank-uitleg-h1i4">1-8 — Wapen kiezen</li>
+            </ul>
+
+            <h3 data-i18n="tank-uitleg-h2">💣 Wapens</h3>
+            <ul>
+                <li data-i18n="tank-uitleg-h2i1">1: Basis — Standaard explosie</li>
+                <li data-i18n="tank-uitleg-h2i2">2: Big Boom — Grote explosie</li>
+                <li data-i18n="tank-uitleg-h2i3">3: Napalm — Grote vuurbal</li>
+                <li data-i18n="tank-uitleg-h2i4">4: MIRV — Splitst in meerdere projectielen</li>
+                <li data-i18n="tank-uitleg-h2i5">5: Bouncy — Stuiterende granaat</li>
+                <li data-i18n="tank-uitleg-h2i6">6: Drill — Boort door de grond</li>
+                <li data-i18n="tank-uitleg-h2i7">7: Cluster — Splitst in extra kleine bommen</li>
+                <li data-i18n="tank-uitleg-h2i8">8: Nuke — Verwoestende atoombom</li>
+            </ul>
+
+            <h3 data-i18n="tank-uitleg-h3">💡 Tip</h3>
+            <p data-i18n="tank-uitleg-h3p">Let op de wind! Die verandert elke beurt en beïnvloedt je schot. Gebruik de stippellijn als richtlijn voor je baan.</p>
+
+            <p style="margin-top: 16px; font-size: 0.85rem; color: var(--text-muted);" data-i18n="tank-uitleg-footer">
+                🤖 Dit spel is gegenereerd door AI.
+            </p>
+        </div>
+
+        <div class="game-area" style="overflow:visible; padding:0; text-align:center;">
+            <iframe src="/static/games/pocket-tanks/index.html" style="width:100%;max-width:1100px;height:830px;border:none;margin:0 auto;min-width:800px;" title="Pocket Tank" scrolling="auto"></iframe>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

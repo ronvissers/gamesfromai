@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Space Invaders — GamesFromAI{% endblock %}
+{% block meta_desc %}Speel Space Invaders — de klassieke arcade shooter! Schiet aliens weg en verdedig de aarde in dit tijdloze spel.{% endblock %}
+{% block og_title %}🎮 Space Invaders — Speel online!{% endblock %}
+{% block og_desc %}De klassieke arcade shooter Space Invaders — opnieuw gebouwd door AI met prachtige graphics!{% endblock %}
+{% block tw_title %}Space Invaders — GamesFromAI{% endblock %}
+{% block tw_desc %}Klassieke arcade shooter met mooie graphics.{% endblock %}
+
+{% block content %}
+
+<section class="game-page">
+    <div class="container">
+        <h1 data-i18n="space-title">👾 Space Invaders</h1>
+        <p class="game-meta" data-i18n="meta-classic">De klassieker — opnieuw gemaakt door AI</p>
+
+        <!-- Uitleg BOVEN het spel -->
+        <div class="game-explanation">
+            <h2 data-i18n="space-uitleg-title">📖 Uitleg</h2>
+            <p data-i18n="space-uitleg-p1">Space Invaders is een iconische arcade-shooter uit 1978. Jij bestuurt een ruimteschip onderaan het scherm en moet golven van buitenaardse indringers vernietigen voordat ze de aarde bereiken.</p>
+
+            <h3 data-i18n="space-uitleg-h1">🎮 Besturing</h3>
+            <ul>
+                <li data-i18n="space-uitleg-h1i1"><strong>← →</strong> — Ruimteschip verplaatsen</li>
+                <li data-i18n="space-uitleg-h1i2"><strong>Spatie</strong> — Schieten</li>
+                <li data-i18n="space-uitleg-h1i3"><strong>P</strong> — Pauzeren</li>
+                <li data-i18n="space-uitleg-h1i4"><strong>S</strong> — Scanlines aan/uit</li>
+                <li data-i18n="space-uitleg-h1i5"><strong>Enter</strong> — Starten / Opnieuw</li>
+            </ul>
+
+            <h3 data-i18n="space-uitleg-h2">👾 Vijanden</h3>
+            <ul>
+                <li data-i18n="space-uitleg-h2i1"><span style="color:#d070d0">●</span> <strong>Inktvis</strong> (boven) — 30 punten</li>
+                <li data-i18n="space-uitleg-h2i2"><span style="color:#60d060">●</span> <strong>Krab</strong> (midden) — 20 punten</li>
+                <li data-i18n="space-uitleg-h2i3"><span style="color:#f0a030">●</span> <strong>Kwal</strong> (onder) — 10 punten</li>
+                <li data-i18n="space-uitleg-h2i4"><span style="color:#f0f">●</span> <strong>UFO</strong> — 50-300 punten (bonus)</li>
+            </ul>
+
+            <h3 data-i18n="space-uitleg-h3">💡 Tip</h3>
+            <p data-i18n="space-uitleg-h3p">Schiet de onderste aliens eerst weg! Hoe minder aliens er zijn, hoe sneller ze schieten. Gebruik de bunkers als dekking tegen vijandelijk vuur.</p>
+            <p style="margin-top: 16px; font-size: 0.85rem; color: var(--text-muted);" data-i18n="space-uitleg-footer">
+                🤖 Dit spel is gegenereerd door AI.
+            </p>
+        </div>
+
+        <!-- Game full-width eronder -->
+        <div class="game-area" style="overflow:hidden; padding:0; text-align:center;">
+            <iframe src="/static/games/space-invaders.html"
+                    style="width:100%;max-width:800px;height:700px;border:none;margin:0 auto;min-width:600px;"
+                    title="Space Invaders" scrolling="auto"></iframe>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

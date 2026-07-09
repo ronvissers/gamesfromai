@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zeeslag</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; user-select:none; }
+body {
+  background: #0a0e1a;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  display:flex; justify-content:center; align-items:center;
+  min-height:100vh; overflow:hidden;
+}
+canvas { display:block; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+(function(){
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+
+const W = 1100, H = 720;
+canvas.width = W; canvas.height = H;
+
+/* ── Game State ── */
+let phase = 'placement'; // 'placement' | 'battle' | 'gameover'
+let playerWins = false;
+let gameMsg = '';
+let msgTimer = 0;
+
+const GRID = 10;
+const CELL = 40;
+const GAP = 60;
+
+// Grid origins
+const PX = 100, PY = 160; // player grid
+const CX = 600, PY2 = 160; // computer grid
+
+// Ships config
+const SHIP_TYPES = [
+  { name: 'Vliegdekschip', size:5, placed:0 },
+  { name: 'Slagschip', size:4, placed:0 },
+  { name: 'Kruiser', size:3, placed:0 },
+  { name: 'Onderzeeër', size:3, placed:0 },
+  { name: 'Torpedoboot', size:2, placed:0 },
+];
+let placingIndex = 0; // which ship type player is placing
+let placingHori = true;
+let validPlacement = false;
+let hoverRow = -1, hoverCol = -1;
+
+// Grids: 0=empty, 1=ship, 2=hit, 3=miss, 4=sunk
+let playerGrid = Array.from({length:GRID}, () => Array(GRID).fill(0));
+let compGrid = Array.from({length:GRID}, () => Array(GRID).fill(0));
+
+// Player ships placed (for reference)
+let playerShips = []; // [{r,c,size,horizontal,hits}]
+let compShips = [];
+
+// Shot tracking
+let playerShots = 0;
+let compShots = 0;
+let playerHits = 0, compHits = 0;
+let computerTarget = null; // for hunt mode
+let computerTargetQueue = [];
+let computerLastHit = null;
+
+// Animations & particles
+let particles = [];
+let explosions = [];
+let splashParticles = [];
+let screenShake = 0;
+let animFrame = 0;
+
+// Computer turn animation
+let compTurn = false;
+let compTargetRow=-1, compTargetCol=-1;
+let compAnimTimer = 0;
+let compReveal = false;
+let compResult = null;
+
+// Shot animation (player)
+let playerShotAnim = null; // {r,c,result,timer}
+
+/* ── Utility ── */
+function rand(n){return Math.floor(Math.random()*n);}
+
+function cloneGrid(g){return g.map(r=>[...r]);}
+
+function getCell(g,r,c){
+  if(r<0||r>=GRID||c<0||c>=GRID)return -1;
+  return g[r][c];
+}
+
+/* ── Particles ── */
+function createExplosion(x,y,color,count,size){
+  for(let i=0;i<count;i++){
+    const angle=Math.random()*Math.PI*2;
+    const speed=1+Math.random()*5;
+    particles.push({
+      x,y,
+      vx:Math.cos(angle)*speed,
+      vy:Math.sin(angle)*speed-1,
+      color,life:1,decay:0.01+Math.random()*0.025,
+      size:size||(2+Math.random()*5),
+      gravity:0.08
+    });
+  }
+}
+
+function createSplash(x,y){
+  for(let i=0;i<12;i++){
+    const angle=-Math.PI/2+Math.random()*Math.PI-0.5;
+    const speed=1+Math.random()*3;
+    particles.push({
+      x,y,
+      vx:Math.cos(angle)*speed,
+      vy:Math.sin(angle)*speed,
+      color:'rgba(100,200,255,0.9)',
+      life:1,decay:0.02+Math.random()*0.03,
+      size:2+Math.random()*4,
+      gravity:0.15
+    });
+  }
+}
+
+function createFireRing(x,y,color,count){
+  for(let i=0;i<count;i++){
+    const angle=(Math.PI*2/count)*i;
+    const speed=2+Math.random()*3;
+    particles.push({
+      x,y,
+      vx:Math.cos(angle)*speed,
+      vy:Math.sin(angle)*speed,
+      color:color||'#ff4400',
+      life:1,decay:0.015+Math.random()*0.02,
+      size:2+Math.random()*4,
+      gravity:0.03
+    });
+  }
+}
+
+function updateParticles(){
+  for(let i=particles.length-1;i>=0;i--){
+    const p=particles[i];
+    p.x+=p.vx;p.y+=p.vy;
+    p.vy+=p.gravity||0.08;
+    p.life-=p.decay;
+    if(p.life<=0)particles.splice(i,1);
+  }
+}
+
+/* ── Grid coords ── */
+function gridOrigin(gx,gy){return {x:gx,y:gy};}
+
+function cellCenter(gx,gy,r,c){
+  return {x:gx+c*CELL+CELL/2, y:gy+r*CELL+CELL/2};
+}
+
+function cellFromPos(mx,my,gx,gy){
+  const c=Math.floor((mx-gx)/CELL);
+  const r=Math.floor((my-gy)/CELL);
+  if(r<0||r>=GRID||c<0||c>=GRID)return null;
+  return {r,c};
+}
+
+function canPlace(grid,r,c,size,horiz){
+  if(horiz){
+    if(c+size>GRID)return false;
+    for(let i=0;i<size;i++)if(grid[r][c+i]===1)return false;
+  } else {
+    if(r+size>GRID)return false;
+    for(let i=0;i<size;i++)if(grid[r+i][c]===1)return false;
+  }
+  return true;
+}
+
+function placeShip(grid,r,c,size,horiz){
+  const cells=[];
+  if(horiz){
+    for(let i=0;i<size;i++){grid[r][c+i]=1;cells.push({r,c:c+i});}
+  } else {
+    for(let i=0;i<size;i++){grid[r+i][c]=1;cells.push({r:r+i,c});}
+  }
+  return cells;
+}
+
+function getShipAt(grid,r,c,horiz,size,ships){
+  for(let si=0;si<ships.length;si++){
+    const s=ships[si];
+    for(let ci=0;ci<s.cells.length;ci++){
+      if(s.cells[ci].r===r&&s.cells[ci].c===c)return si;
+    }
+  }
+  return -1;
+}
+
+function isShipSunk(grid,ship){
+  for(let ci=0;ci<ship.cells.length;ci++){
+    const v=grid[ship.cells[ci].r][ship.cells[ci].c];
+    if(v!==2&&v!==4)return false;
+  }
+  return true;
+}
+
+function countActiveShips(grid,ships){
+  let c=0;
+  for(let si=0;si<ships.length;si++){
+    if(!isShipSunk(grid,ships[si]))c++;
+  }
+  return c;
+}
+
+/* ── AI Placement ── */
+function generateCompShips(){
+  compGrid = Array.from({length:GRID}, () => Array(GRID).fill(0));
+  compShips=[];
+  for(let si=0;si<SHIP_TYPES.length;si++){
+    const size=SHIP_TYPES[si].size;
+    let placed=false;
+    let tries=0;
+    while(!placed&&tries<1000){
+      tries++;
+      const r=rand(GRID),c=rand(GRID);
+      const horiz=Math.random()<0.5;
+      if(canPlace(compGrid,r,c,size,horiz)){
+        const cells=placeShip(compGrid,r,c,size,horiz);
+        compShips.push({r,c,size,horizontal:horiz,cells,hits:0});
+        placed=true;
+      }
+    }
+    if(!placed)return generateCompShips(); // retry
+  }
+}
+
+/* ── Computer AI ── */
+function computerShoot(){
+  let r,c;
+  if(computerTargetQueue.length>0){
+    let t=computerTargetQueue.shift();
+    // Check if already shot there — pop stale entries
+    while(t&&(getCell(playerGrid,t.r,t.c)===2||getCell(playerGrid,t.r,t.c)===3||getCell(playerGrid,t.r,t.c)===4)&&computerTargetQueue.length>0){
+      t=computerTargetQueue.shift();
+    }
+    if(t&&getCell(playerGrid,t.r,t.c)!==2&&getCell(playerGrid,t.r,t.c)!==3&&getCell(playerGrid,t.r,t.c)!==4){
+      r=t.r;c=t.c;
+    } else {
+      do {r=rand(GRID);c=rand(GRID);} while(getCell(playerGrid,r,c)===2||getCell(playerGrid,r,c)===3||getCell(playerGrid,r,c)===4);
+    }
+  } else {
+    // Random shot
+    do {
+      r=rand(GRID);c=rand(GRID);
+    } while(getCell(playerGrid,r,c)===2||getCell(playerGrid,r,c)===3||getCell(playerGrid,r,c)===4);
+  }
+
+  compTargetRow=r;compTargetCol=c;
+  compTurn=true;
+  compAnimTimer=0;
+  compReveal=false;
+  compResult=null;
+
+  // Determine result now
+  setTimeout(()=>{
+    if(playerGrid[r][c]===1){
+      playerGrid[r][c]=2;
+      compHits++;
+      compResult='hit';
+      explodeAnim(r,c,true);
+      // Check sunk
+      let sunk=false;
+      for(let si=0;si<playerShips.length;si++){
+        if(isShipSunk(playerGrid,playerShips[si])){
+          sunk=true;
+          for(let ci=0;ci<playerShips[si].cells.length;ci++){
+            const pc=playerShips[si].cells[ci];
+            playerGrid[pc.r][pc.c]=4;
+          }
+          gameMsg=playerShips[si].size===5?'VLIEGDEKSCHEP GEZONDEN!':
+                 playerShips[si].size===4?'SLAGSCHIP GEZONDEN!':
+                 'Schip gezonken!';
+          msgTimer=120;
+        }
+      }
+      // Add adjacent cells to queue
+      const dirs=[[0,1],[0,-1],[1,0],[-1,0]];
+      for(let d of dirs){
+        const nr=r+d[0],nc=c+d[1];
+        if(nr>=0&&nr<GRID&&nc>=0&&nc<GRID&&playerGrid[nr][nc]!==2&&playerGrid[nr][nc]!==3&&playerGrid[nr][nc]!==4){
+          computerTargetQueue.push({r:nr,c:nc});
+        }
+      }
+    } else {
+      playerGrid[r][c]=3;
+      compResult='miss';
+      splashAnim(r,c,true);
+    }
+    compReveal=true;
+    // Check game over
+    if(countActiveShips(playerGrid,playerShips)===0){
+      phase='gameover';playerWins=false;
+      createExplosion(W/2,H/2,'#ff4444',80,8);
+    }
+    // Release turn locks so player can shoot again
+    compTurn=false;
+    playerShotAnim=null;
+  }, 800);
+}
+
+function explodeAnim(r,c,isPlayer){
+  const gx=isPlayer?PX:CX,gy=isPlayer?PY:PY2;
+  const p=cellCenter(gx,gy,r,c);
+  createExplosion(p.x,p.y,'#ff6600',30,6);
+  createExplosion(p.x,p.y,'#ffcc00',20,4);
+  createFireRing(p.x,p.y,'#ff3300',16);
+  screenShake=10;
+}
+
+function splashAnim(r,c,isPlayer){
+  const gx=isPlayer?PX:CX,gy=isPlayer?PY:PY2;
+  const p=cellCenter(gx,gy,r,c);
+  createSplash(p.x+rand(10)-5,p.y+rand(10)-5);
+}
+
+/* ── Player Shoot ── */
+function playerShoot(r,c){
+  if(phase!=='battle'||compTurn||playerShotAnim)return;
+  if(compGrid[r][c]===2||compGrid[r][c]===3||compGrid[r][c]===4)return;
+
+  playerShotAnim={r,c,result:null,timer:0};
+
+  setTimeout(()=>{
+    if(compGrid[r][c]===1){
+      compGrid[r][c]=2;
+      playerHits++;
+      playerShotAnim.result='hit';
+      explodeAnim(r,c,false);
+      createExplosion(
+        cellCenter(CX,PY2,r,c).x,
+        cellCenter(CX,PY2,r,c).y,
+        '#ff2222',8,3
+      );
+      // Check sunk
+      for(let si=0;si<compShips.length;si++){
+        if(isShipSunk(compGrid,compShips[si])){
+          for(let ci=0;ci<compShips[si].cells.length;ci++){
+            const pc=compShips[si].cells[ci];
+            compGrid[pc.r][pc.c]=4;
+            createExplosion(cellCenter(CX,PY2,pc.r,pc.c).x,
+              cellCenter(CX,PY2,pc.r,pc.c).y,'#ff0000',10,4);
+          }
+          gameMsg=compShips[si].size===5?'VLIEGDEKSCHEP VAN COMPUTER GEZONDEN!':
+                 compShips[si].size===4?'SLAGSCHIP VAN COMPUTER GEZONDEN!':
+                 'Computerschip gezonken!';
+          msgTimer=120;
+        }
+      }
+    } else {
+      compGrid[r][c]=3;
+      playerShotAnim.result='miss';
+      splashAnim(r,c,false);
+    }
+    playerShotAnim.reveal=true;
+
+    // Check game over
+    if(countActiveShips(compGrid,compShips)===0){
+      phase='gameover';playerWins=true;
+      createExplosion(W/2,H/2,'#ffcc00',80,8);
+      createExplosion(W/2,H/2,'#ff6600',60,6);
+    } else {
+      // Computer's turn
+      setTimeout(computerShoot,300);
+    }
+  }, 400);
+}
+
+/* ── Drawing ── */
+
+// Background waves
+let waveOffset = 0;
+
+function drawBackground(){
+  // Night ocean gradient
+  const grad=ctx.createLinearGradient(0,0,0,H);
+  grad.addColorStop(0,'#0a0e1a');
+  grad.addColorStop(0.3,'#0d1b2a');
+  grad.addColorStop(0.6,'#0f2847');
+  grad.addColorStop(1,'#0a1628');
+  ctx.fillStyle=grad;
+  ctx.fillRect(0,0,W,H);
+
+  // Stars
+  ctx.fillStyle='rgba(255,255,255,0.4)';
+  for(let i=0;i<120;i++){
+    const sx=(i*137.5)%W,sy=(i*97.3)%(H*0.6);
+    const bright=0.3+0.7*Math.sin(i*0.7+Date.now()*0.0003);
+    ctx.globalAlpha=bright*0.5;
+    ctx.beginPath();
+    ctx.arc(sx,sy,0.5+Math.sin(i)*0.5,0,Math.PI*2);
+    ctx.fill();
+  }
+  ctx.globalAlpha=1;
+
+  // Ocean waves bottom
+  waveOffset+=0.02;
+  ctx.fillStyle='rgba(10,30,60,0.6)';
+  ctx.beginPath();
+  ctx.moveTo(0,H);
+  for(let x=0;x<=W;x+=20){
+    const y=H-60+Math.sin(x*0.02+waveOffset)*12
+           +Math.sin(x*0.04+waveOffset*0.7)*6;
+    ctx.lineTo(x,y);
+  }
+  ctx.lineTo(W,H);ctx.closePath();ctx.fill();
+
+  // Second wave layer
+  ctx.fillStyle='rgba(20,50,90,0.3)';
+  ctx.beginPath();
+  ctx.moveTo(0,H);
+  for(let x=0;x<=W;x+=20){
+    const y=H-40+Math.sin(x*0.03+waveOffset*0.5+1)*8
+           +Math.sin(x*0.05+waveOffset*0.3)*4;
+    ctx.lineTo(x,y);
+  }
+  ctx.lineTo(W,H);ctx.closePath();ctx.fill();
+}
+
+function drawGrid(gx,gy,grid,ships,showShips,label,isPlayer){
+  // Grid background
+  ctx.save();
+  ctx.shadowColor='rgba(0,150,255,0.3)';
+  ctx.shadowBlur=20;
+  ctx.fillStyle='rgba(5,15,35,0.85)';
+  const pad=6;
+  ctx.beginPath();
+  ctx.roundRect(gx-pad,gy-pad,GRID*CELL+pad*2,GRID*CELL+pad*2,4);
+  ctx.fill();
+  ctx.shadowBlur=0;
+
+  // Grid border glow
+  ctx.strokeStyle='rgba(0,100,200,0.3)';
+  ctx.lineWidth=1;
+  ctx.strokeRect(gx,gy,GRID*CELL,GRID*CELL);
+
+  // Cells
+  for(let r=0;r<GRID;r++){
+    for(let c=0;c<GRID;c++){
+      const x=gx+c*CELL,y=gy+r*CELL;
+      const val=grid[r][c];
+
+      // Background cell
+      ctx.fillStyle='rgba(10,25,55,0.6)';
+      ctx.fillRect(x,y,CELL,CELL);
+
+      // Grid lines
+      ctx.strokeStyle='rgba(30,80,150,0.3)';
+      ctx.lineWidth=0.5;
+      ctx.strokeRect(x,y,CELL,CELL);
+
+      if(val===1 && showShips){
+        // Ship cell - dark gray overlay for player's own ships
+        if(isPlayer){
+          ctx.fillStyle='rgba(60,120,180,0.6)';
+          ctx.fillRect(x+1,y+1,CELL-2,CELL-2);
+          // Rivet dots
+          ctx.fillStyle='rgba(100,160,220,0.4)';
+          ctx.beginPath();ctx.arc(x+8,y+8,2,0,Math.PI*2);ctx.fill();
+          ctx.beginPath();ctx.arc(x+CELL-8,y+8,2,0,Math.PI*2);ctx.fill();
+          ctx.beginPath();ctx.arc(x+8,y+CELL-8,2,0,Math.PI*2);ctx.fill();
+          ctx.beginPath();ctx.arc(x+CELL-8,y+CELL-8,2,0,Math.PI*2);ctx.fill();
+        }
+      }
+
+      if(val===2){
+        // Hit - red explosion effect
+        const grad=ctx.createRadialGradient(x+CELL/2,y+CELL/2,0,x+CELL/2,y+CELL/2,CELL/2);
+        grad.addColorStop(0,'rgba(255,60,20,0.9)');
+        grad.addColorStop(0.4,'rgba(200,30,10,0.7)');
+        grad.addColorStop(0.7,'rgba(100,10,5,0.4)');
+        grad.addColorStop(1,'rgba(50,5,2,0)');
+        ctx.fillStyle=grad;
+        ctx.fillRect(x,y,CELL,CELL);
+
+        // Cross mark
+        ctx.strokeStyle='rgba(255,80,40,0.9)';
+        ctx.lineWidth=3;
+        ctx.beginPath();
+        ctx.moveTo(x+10,y+10);ctx.lineTo(x+CELL-10,y+CELL-10);
+        ctx.moveTo(x+CELL-10,y+10);ctx.lineTo(x+10,y+CELL-10);
+        ctx.stroke();
+        // Outer glow
+        ctx.strokeStyle='rgba(255,100,50,0.3)';
+        ctx.lineWidth=6;
+        ctx.beginPath();
+        ctx.moveTo(x+10,y+10);ctx.lineTo(x+CELL-10,y+CELL-10);
+        ctx.moveTo(x+CELL-10,y+10);ctx.lineTo(x+10,y+CELL-10);
+        ctx.stroke();
+      }
+
+      if(val===3){
+        // Miss - splash
+        ctx.fillStyle='rgba(60,120,180,0.25)';
+        ctx.beginPath();
+        ctx.arc(x+CELL/2,y+CELL/2,8+Math.sin(Date.now()*0.003+r*3+c*7)*2,0,Math.PI*2);
+        ctx.fill();
+
+        // Small circle
+        ctx.strokeStyle='rgba(100,180,255,0.5)';
+        ctx.lineWidth=1.5;
+        ctx.beginPath();
+        ctx.arc(x+CELL/2,y+CELL/2,6,0,Math.PI*2);
+        ctx.stroke();
+
+        // Ripple dots
+        ctx.fillStyle='rgba(100,200,255,0.15)';
+        ctx.beginPath();
+        ctx.arc(x+CELL/2-4,y+CELL/2-3,2,0,Math.PI*2);ctx.fill();
+        ctx.beginPath();
+        ctx.arc(x+CELL/2+5,y+CELL/2+2,1.5,0,Math.PI*2);ctx.fill();
+      }
+
+      if(val===4){
+        // Sunk - red + X with fire glow
+        const grad=ctx.createRadialGradient(x+CELL/2,y+CELL/2,0,x+CELL/2,y+CELL/2,CELL/2);
+        grad.addColorStop(0,'rgba(180,20,10,0.7)');
+        grad.addColorStop(0.5,'rgba(120,10,5,0.5)');
+        grad.addColorStop(1,'rgba(30,5,2,0)');
+        ctx.fillStyle=grad;
+        ctx.fillRect(x,y,CELL,CELL);
+
+        ctx.strokeStyle='rgba(255,50,20,0.8)';
+        ctx.lineWidth=3;
+        ctx.beginPath();
+        ctx.moveTo(x+8,y+8);ctx.lineTo(x+CELL-8,y+CELL-8);
+        ctx.moveTo(x+CELL-8,y+8);ctx.lineTo(x+8,y+CELL-8);
+        ctx.stroke();
+
+        ctx.strokeStyle='rgba(255,100,50,0.4)';
+        ctx.lineWidth=2;
+        ctx.beginPath();
+        ctx.moveTo(x+12,y+12);ctx.lineTo(x+CELL-12,y+CELL-12);
+        ctx.moveTo(x+CELL-12,y+12);ctx.lineTo(x+12,y+CELL-12);
+        ctx.stroke();
+      }
+    }
+  }
+
+  // Row/col labels
+  ctx.fillStyle='rgba(100,180,255,0.7)';
+  ctx.font='12px sans-serif';
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  const labels='ABCDEFGHIJ';
+  for(let i=0;i<GRID;i++){
+    ctx.fillText(labels[i],gx+i*CELL+CELL/2,gy-18);
+    ctx.fillText(i+1,gx-18,gy+i*CELL+CELL/2);
+  }
+
+  // Label above grid
+  ctx.fillStyle='rgba(180,220,255,0.9)';
+  ctx.font='bold 16px sans-serif';
+  ctx.textAlign='center';
+  ctx.fillText(label,gx+GRID*CELL/2,gy-42);
+
+  ctx.restore();
+}
+
+function drawPlacementOverlay(){
+  if(phase!=='placement')return;
+  if(placingIndex>=SHIP_TYPES.length){
+    // All ships placed - show start message
+    ctx.fillStyle='rgba(100,255,150,0.9)';
+    ctx.font='bold 20px sans-serif';
+    ctx.textAlign='center';
+    ctx.fillText('Alle schepen geplaatst! Klik om te beginnen!',W/2,50);
+    return;
+  }
+  const ship=SHIP_TYPES[placingIndex];
+  const label='Plaats je '+ship.name+' ('+ship.size+' vakjes)';
+  ctx.fillStyle='rgba(180,220,255,0.9)';
+  ctx.font='bold 18px sans-serif';
+  ctx.textAlign='center';
+  ctx.fillText(label,W/2,50);
+
+  ctx.fillStyle='rgba(100,180,255,0.6)';
+  ctx.font='14px sans-serif';
+  ctx.fillText('Klik om te plaatsen | Spatie = draaien',W/2,78);
+
+  // Ship progress
+  const total=SHIP_TYPES.length;
+  const placed=placingIndex;
+  for(let i=0;i<total;i++){
+    const x=280+i*40;
+    ctx.fillStyle=i<placed?'rgba(60,200,100,0.7)':
+                 i===placed?'rgba(100,180,255,0.7)':'rgba(60,60,80,0.4)';
+    ctx.beginPath();ctx.arc(x,100,8,0,Math.PI*2);ctx.fill();
+  }
+
+  // Hover preview
+  if(hoverRow>=0&&hoverCol>=0){
+    const show=canPlace(playerGrid,hoverRow,hoverCol,ship.size,placingHori);
+    const color=show?'rgba(60,200,100,0.4)':'rgba(200,40,40,0.4)';
+    if(placingHori){
+      for(let i=0;i<ship.size;i++){
+        if(hoverCol+i<GRID){
+          ctx.fillStyle=color;
+          ctx.fillRect(PX+(hoverCol+i)*CELL,PY+hoverRow*CELL,CELL,CELL);
+          ctx.strokeStyle=show?'rgba(100,255,150,0.6)':'rgba(255,80,80,0.6)';
+          ctx.lineWidth=1;ctx.strokeRect(PX+(hoverCol+i)*CELL,PY+hoverRow*CELL,CELL,CELL);
+        }
+      }
+    } else {
+      for(let i=0;i<ship.size;i++){
+        if(hoverRow+i<GRID){
+          ctx.fillStyle=color;
+          ctx.fillRect(PX+hoverCol*CELL,PY+(hoverRow+i)*CELL,CELL,CELL);
+          ctx.strokeStyle=show?'rgba(100,255,150,0.6)':'rgba(255,80,80,0.6)';
+          ctx.lineWidth=1;ctx.strokeRect(PX+hoverCol*CELL,PY+(hoverRow+i)*CELL,CELL,CELL);
+        }
+      }
+    }
+  }
+}
+
+function drawUI(){
+  // Stats during battle
+  if(phase==='battle'){
+    // Player stats
+    ctx.fillStyle='rgba(100,200,150,0.8)';
+    ctx.font='bold 14px sans-serif';
+    ctx.textAlign='left';
+    ctx.fillText('Jouw hits: '+playerHits, PX, PY+GRID*CELL+22);
+
+    // Computer stats
+    ctx.fillStyle='rgba(255,100,100,0.8)';
+    ctx.fillText('Computer hits: '+compHits, CX, PY2+GRID*CELL+22);
+
+    // Ship count
+    const pShips=countActiveShips(playerGrid,playerShips);
+    const cShips=countActiveShips(compGrid,compShips);
+    ctx.fillStyle='rgba(180,220,255,0.6)';
+    ctx.font='13px sans-serif';
+    ctx.fillText('Jouw schepen: '+pShips, PX, PY+GRID*CELL+42);
+    ctx.fillText('Computer schepen: '+cShips, CX, PY2+GRID*CELL+42);
+
+    // Turn indicator
+    if(compTurn){
+      ctx.fillStyle='rgba(255,200,80,0.9)';
+      ctx.font='bold 16px sans-serif';
+      ctx.textAlign='center';
+      ctx.fillText('Computer denkt na...',W/2,140);
+    } else {
+      ctx.fillStyle='rgba(100,200,255,0.9)';
+      ctx.font='bold 16px sans-serif';
+      ctx.textAlign='center';
+      ctx.fillText('Klik op het raster van de computer om te vuren!',W/2,140);
+    }
+
+    // Shot marker - shows where the player just fired
+    if(playerShotAnim && playerShotAnim.timer !== undefined){
+      const elapsed = playerShotAnim.timer;
+      const mx = CX + playerShotAnim.c * CELL + CELL/2;
+      const my = PY2 + playerShotAnim.r * CELL + CELL/2;
+      const pulse = 1 + Math.sin(elapsed * 0.2) * 0.15;
+      const alpha = 1 - elapsed / 60;
+      if(alpha > 0){
+        ctx.save();
+        ctx.strokeStyle = `rgba(100,200,255,${alpha*0.7})`;
+        ctx.lineWidth = 2;
+        const s = 12 * pulse;
+        ctx.beginPath();
+        ctx.moveTo(mx-s, my); ctx.lineTo(mx+s, my);
+        ctx.moveTo(mx, my-s); ctx.lineTo(mx, my+s);
+        ctx.stroke();
+        ctx.strokeStyle = `rgba(100,200,255,${alpha*0.3})`;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(mx, my, s*0.8, 0, Math.PI*2);
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+    // Instructions
+    ctx.fillStyle='rgba(100,180,255,0.5)';
+    ctx.font='12px sans-serif';
+    ctx.textAlign='center';
+    ctx.fillText('Jouw vloot (links) — Computer (rechts)',W/2,PY-68);
+  }
+
+  // Game message
+  if(gameMsg&&msgTimer>0){
+    const alpha=Math.min(1,msgTimer/30);
+    ctx.save();
+    ctx.shadowColor='rgba(0,0,0,0.8)';
+    ctx.shadowBlur=15;
+    ctx.fillStyle=`rgba(255,200,50,${alpha*0.9})`;
+    ctx.font='bold 22px sans-serif';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(gameMsg,W/2,60);
+    ctx.restore();
+  }
+
+  // Game over
+  if(phase==='gameover'){
+    ctx.save();
+    ctx.fillStyle='rgba(0,0,0,0.6)';
+    ctx.fillRect(0,0,W,H);
+
+    ctx.shadowColor='rgba(255,200,0,0.5)';
+    ctx.shadowBlur=30;
+    ctx.fillStyle=playerWins?'#ffcc00':'#ff4444';
+    ctx.font='bold 48px sans-serif';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(playerWins?'GEWONNEN! 🎉':'VERLOREN! 💀',W/2,H/2-30);
+
+    ctx.shadowBlur=0;
+    ctx.fillStyle='rgba(180,220,255,0.8)';
+    ctx.font='20px sans-serif';
+    ctx.fillText('Druk op R voor een nieuw spel',W/2,H/2+40);
+
+    ctx.fillStyle='rgba(150,200,255,0.6)';
+    ctx.font='16px sans-serif';
+    ctx.fillText(`Jij: ${playerHits} hits | Computer: ${compHits} hits`,W/2,H/2+80);
+    ctx.restore();
+  }
+
+  // Ship placement instructions
+  if(phase==='placement'&&placingIndex>=SHIP_TYPES.length){
+    ctx.fillStyle='rgba(100,255,150,0.9)';
+    ctx.font='bold 20px sans-serif';
+    ctx.textAlign='center';
+    ctx.fillText('Alle schepen geplaatst! Klik om te beginnen!',W/2,50);
+  }
+}
+
+function drawRadarSweep(){
+  if(phase!=='battle'&&phase!=='gameover')return;
+  const t=Date.now()*0.001;
+  const gx=CX,gy=PY2;
+  const cx=gx+GRID*CELL/2,cy=gy+GRID*CELL/2;
+  const radius=GRID*CELL*0.7;
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(gx,gy,GRID*CELL,GRID*CELL);
+  ctx.clip();
+
+  // Radar sweep line
+  const angle=t*0.8;
+  ctx.strokeStyle='rgba(60,200,255,0.15)';
+  ctx.lineWidth=1;
+  ctx.beginPath();
+  ctx.moveTo(cx,cy);
+  ctx.lineTo(cx+Math.cos(angle)*radius,cy+Math.sin(angle)*radius);
+  ctx.stroke();
+
+  // Radar glow
+  const grad=ctx.createRadialGradient(
+    cx+Math.cos(angle)*radius*0.3,cy+Math.sin(angle)*radius*0.3,0,
+    cx,cy,radius*0.5
+  );
+  grad.addColorStop(0,'rgba(60,200,255,0.05)');
+  grad.addColorStop(1,'rgba(60,200,255,0)');
+  ctx.fillStyle=grad;
+  ctx.beginPath();
+  ctx.arc(cx+Math.cos(angle)*radius*0.3,cy+Math.sin(angle)*radius*0.3,radius*0.5,0,Math.PI*2);
+  ctx.fill();
+
+  ctx.restore();
+}
+
+/* ── Main Loop ── */
+function render(){
+  ctx.save();
+
+  // Screen shake
+  if(screenShake>0){
+    const sx=(Math.random()-0.5)*screenShake;
+    const sy=(Math.random()-0.5)*screenShake;
+    ctx.translate(sx,sy);
+    screenShake*=0.9;
+    if(screenShake<0.5)screenShake=0;
+  }
+
+  drawBackground();
+  animFrame++;
+
+  // Draw player grid
+  drawGrid(PX,PY,playerGrid,playerShips,true,'JOUW VLOT',true);
+  // Draw computer grid
+  const showCompShips=phase==='gameover'||phase==='placement';
+  drawGrid(CX,PY2,compGrid,compShips,showCompShips,'COMPUTER',false);
+
+  if(phase==='placement'){
+    drawPlacementOverlay();
+    // If all placed, show "click to start"
+    if(placingIndex>=SHIP_TYPES.length){
+      ctx.fillStyle='rgba(100,255,150,0.8)';
+      ctx.font='bold 20px sans-serif';
+      ctx.textAlign='center';
+      ctx.fillText('Klik ergens om het gevecht te starten!',W/2,135);
+    }
+  }
+
+  drawRadarSweep();
+  drawUI();
+
+  // Draw particles
+  updateParticles();
+  for(let p of particles){
+    ctx.globalAlpha=Math.max(0,p.life);
+    ctx.fillStyle=p.color||'#ff6600';
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.size*Math.max(0,p.life),0,Math.PI*2);
+    ctx.fill();
+  }
+  ctx.globalAlpha=1;
+
+  ctx.restore();
+
+  // Update message timer
+  if(msgTimer>0)msgTimer--;
+  if(gameMsg&&msgTimer<=0)gameMsg='';
+
+  // Update shot marker timer
+  if(playerShotAnim && playerShotAnim.timer !== undefined) playerShotAnim.timer++;
+}
+
+let mouseX=0,mouseY=0;
+
+/* ── Input ── */
+canvas.addEventListener('click',e=>{
+  const rect=canvas.getBoundingClientRect();
+  const mx=(e.clientX-rect.left)*(W/rect.width);
+  const my=(e.clientY-rect.top)*(H/rect.height);
+
+  if(phase==='placement'){
+    if(placingIndex<SHIP_TYPES.length){
+      const cell=cellFromPos(mx,my,PX,PY);
+      if(cell){
+        const ship=SHIP_TYPES[placingIndex];
+        if(canPlace(playerGrid,cell.r,cell.c,ship.size,placingHori)){
+          const cells=placeShip(playerGrid,cell.r,cell.c,ship.size,placingHori);
+          playerShips.push({r:cell.r,c:cell.c,size:ship.size,horizontal:placingHori,cells,hits:0});
+          placingIndex++;
+        }
+        }
+    } else {
+      // Start game
+      if(phase==='placement'){
+        phase='battle';
+        gameMsg='Gevecht begonnen! Jouw beurt.';
+        msgTimer=90;
+      }
+    }
+    return;
+  }
+
+  if(phase==='battle'&&!compTurn&&!playerShotAnim){
+    const cell=cellFromPos(mx,my,CX,PY2);
+    if(cell){
+      playerShoot(cell.r,cell.c);
+    } else {
+      // Check if they clicked on their own grid instead
+      const ownCell=cellFromPos(mx,my,PX,PY);
+      if(ownCell){
+        gameMsg='⚠️ Klik op het RECHTER raster (COMPUTER)!';
+        msgTimer=60;
+      }
+    }
+  }
+
+  if(phase==='gameover'){
+    // handled by keydown R
+  }
+});
+
+canvas.addEventListener('mousemove',e=>{
+  const rect=canvas.getBoundingClientRect();
+  mouseX=(e.clientX-rect.left)*(W/rect.width);
+  mouseY=(e.clientY-rect.top)*(H/rect.height);
+
+  if(phase==='placement'&&placingIndex<SHIP_TYPES.length){
+    const cell=cellFromPos(mouseX,mouseY,PX,PY);
+    if(cell){hoverRow=cell.r;hoverCol=cell.c;}
+    else {hoverRow=-1;hoverCol=-1;}
+  }
+});
+
+canvas.addEventListener('mouseleave',()=>{hoverRow=-1;hoverCol=-1;});
+
+document.addEventListener('keydown',e=>{
+  if(e.key===' '){
+    e.preventDefault();
+    if(phase==='placement')placingHori=!placingHori;
+  }
+  if(e.key==='r'||e.key==='R'){
+    resetGame();
+  }
+});
+
+/* ── Reset ── */
+function resetGame(){
+  phase='placement';
+  playerGrid = Array.from({length:GRID}, () => Array(GRID).fill(0));
+  playerShips=[];
+  placingIndex=0;
+  placingHori=true;
+  hoverRow=-1;hoverCol=-1;
+  playerShots=0;compShots=0;
+  playerHits=0;compHits=0;
+  computerTargetQueue=[];
+  computerLastHit=null;
+  compTurn=false;
+  compTargetRow=-1;compTargetCol=-1;
+  playerShotAnim=null;
+  particles=[];
+  screenShake=0;
+  gameMsg='';
+  msgTimer=0;
+  generateCompShips();
+}
+
+/* ── Init ── */
+generateCompShips();
+
+function gameLoop(){
+  render();
+  requestAnimationFrame(gameLoop);
+}
+gameLoop();
+
+})();
+</script>
+</body>
+</html>

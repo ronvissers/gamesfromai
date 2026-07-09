@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Cookiebeleid — GamesFromAI | Privacy & Cookies{% endblock %}
+{% block meta_desc %}Het cookiebeleid van GamesFromAI. Lees welke cookies we gebruiken en hoe je je voorkeuren kunt beheren.{% endblock %}
+{% block og_title %}Cookiebeleid — GamesFromAI{% endblock %}
+{% block og_desc %}Lees het cookiebeleid van GamesFromAI: functionele cookies, analytics en jouw privacy.{% endblock %}
+{% block content %}
+
+<section class="game-page">
+    <div class="container">
+        <h1>🍪 <span data-i18n="cookie-page-title">Cookiebeleid</span></h1>
+        <p class="game-meta" data-i18n="cookie-page-meta">Laatst bijgewerkt: juli 2026</p>
+
+        <div class="game-explanation" style="max-width: 800px;">
+            <h2 data-i18n="cookie-h-what">Wat zijn cookies?</h2>
+            <p data-i18n="cookie-p-what">Cookies zijn kleine tekstbestanden die op je apparaat worden opgeslagen wanneer je een website bezoekt. Ze helpen websites beter te functioneren en geven inzicht in hoe bezoekers de site gebruiken.</p>
+
+            <h2 data-i18n="cookie-h-which">Welke cookies gebruiken wij?</h2>
+            
+            <h3 data-i18n="cookie-h-functional">🔹 Functionele cookies (noodzakelijk)</h3>
+            <p data-i18n="cookie-p-functional">Deze cookies zijn nodig om de website goed te laten werken. Ze onthouden bijvoorbeeld of je de cookiebanner hebt geaccepteerd, zodat we 'm niet elke keer opnieuw tonen.</p>
+            <ul>
+                <li data-i18n="cookie-li-accepted"><strong>cookies_accepted</strong> — onthoudt je cookievoorkeur (lokale opslag)</li>
+                <li data-i18n="cookie-li-theme"><strong>theme</strong> — onthoudt je donker/licht voorkeur</li>
+                <li data-i18n="cookie-li-lang"><strong>lang</strong> — onthoudt je taalvoorkeur (NL/EN)</li>
+            </ul>
+
+            <h3 data-i18n="cookie-h-analytics">🔹 Analytics cookies (met toestemming)</h3>
+            <p data-i18n="cookie-p-analytics">We gebruiken <strong>Google Analytics</strong> (GA4) om te zien welke pagina's populair zijn en hoe bezoekers de site gebruiken. Dit helpt ons de website te verbeteren. Alle gegevens worden geanonimiseerd. Je kunt cookies accepteren of weigeren via de cookiebanner onderaan de pagina.</p>
+
+            <h2 data-i18n="cookie-h-third">Cookies van derden</h2>
+            <p data-i18n="cookie-p-third">GamesFromAI gebruikt geen cookies van derde partijen voor advertenties of tracking. Alleen Google Analytics (als je toestemming geeft) en functionele cookies.</p>
+
+            <h2 data-i18n="cookie-h-choices">Jouw keuzes</h2>
+            <p data-i18n="cookie-p-choices">Je kunt cookies altijd weigeren of verwijderen via je browserinstellingen.</p>
+            <ul>
+                <li data-i18n="cookie-li-chrome"><strong>Chrome:</strong> Instellingen → Privacy en beveiliging → Cookies</li>
+                <li data-i18n="cookie-li-firefox"><strong>Firefox:</strong> Opties → Privacy & Beveiliging → Cookies</li>
+                <li data-i18n="cookie-li-safari"><strong>Safari:</strong> Voorkeuren → Privacy → Beheer websitegegevens</li>
+            </ul>
+
+            <h2 data-i18n="cookie-h-changes">Wijzigingen</h2>
+            <p data-i18n="cookie-p-changes">Dit cookiebeleid kan van tijd tot tijd worden bijgewerkt. De datum bovenaan geeft aan wanneer het voor het laatst is gewijzigd.</p>
+
+            <p style="margin-top: 24px; font-size: 0.85rem; color: var(--text-muted);" data-i18n="cookie-footer">📧 Vragen? Neem contact op via de website.</p>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

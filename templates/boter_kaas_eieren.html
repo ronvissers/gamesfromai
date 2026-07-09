@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Boter, Kaas & Eieren — GamesFromAI{% endblock %}
+{% block meta_desc %}Speel Boter, Kaas en Eieren (Tic-Tac-Toe) online! Tegen de computer of tegen een vriend. Gratis, met onverslaanbare AI.{% endblock %}
+{% block og_title %}❌ Boter, Kaas & Eieren — Speel online!{% endblock %}
+{% block og_desc %}Het klassieke bordspel met ✕ en ○. Speel tegen elkaar of tegen een onverslaanbare AI. Gratis online!{% endblock %}
+{% block tw_title %}Boter, Kaas & Eieren — GamesFromAI{% endblock %}
+{% block tw_desc %}Speel Boter, Kaas en Eieren online. Tegen computer of vriend.{% endblock %}
+{% block content %}
+
+<section class="game-page">
+    <div class="container">
+        <h1>❌ <span data-i18n="card-boter-title">Boter, Kaas & Eieren</span></h1>
+        <p class="game-meta" data-i18n="meta-classic">De klassieker — opnieuw gemaakt door AI</p>
+
+        <div class="game-explanation">
+            <h2 data-i18n="boter-uitleg-title">📖 Uitleg</h2>
+            <p data-i18n="boter-uitleg-p1">Boter, Kaas en Eieren (Tic-Tac-Toe) is het klassieke bordspel voor twee spelers. Zet om de beurt een ✕ of ○ in een vakje. Wie als eerste drie op een rij heeft, wint!</p>
+
+            <h3 data-i18n="boter-uitleg-h1">🎮 Modi</h3>
+            <ul>
+                <li data-i18n="boter-uitleg-h1i1">👥 Tegen elkaar — Speel met z'n tweeën op één apparaat</li>
+                <li data-i18n="boter-uitleg-h1i2">🤖 Tegen computer — Speel tegen een onverslaanbare AI</li>
+            </ul>
+
+            <h3 data-i18n="boter-uitleg-h2">🎯 Regels</h3>
+            <ul>
+                <li data-i18n="boter-uitleg-h2i1">✕ begint altijd, tenzij de computer start (willekeurig)</li>
+                <li data-i18n="boter-uitleg-h2i2">Drie op een rij (horizontaal, verticaal of diagonaal) = winnen</li>
+                <li data-i18n="boter-uitleg-h2i3">Alle 9 vakjes vol = gelijkspel</li>
+            </ul>
+
+            <h3 data-i18n="boter-uitleg-h3">💡 Tip</h3>
+            <p data-i18n="boter-uitleg-h3p">De computer gebruikt het Minimax-algoritme — hij is onverslaanbaar! Probeer het gelijk te houden voor een gelijkspel.</p>
+
+            <p style="margin-top: 16px; font-size: 0.85rem; color: var(--text-muted);" data-i18n="boter-uitleg-footer">
+                🤖 Dit spel is gegenereerd door AI.
+            </p>
+        </div>
+
+        <div class="game-area" style="overflow:visible; padding:0; text-align:center;">
+            <iframe src="/static/games/boter-kaas-eieren.html" style="width:100%;max-width:400px;height:650px;border:none;margin:0 auto;" title="Boter, Kaas & Eieren" scrolling="no"></iframe>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

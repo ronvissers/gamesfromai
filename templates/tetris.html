@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Tetris — GamesFromAI{% endblock %}
+{% block content %}
+
+<section class="game-page">
+    <div class="container">
+        <h1>🧱 <span data-i18n="card-tetris-title">Tetris</span></h1>
+        <p class="game-meta" data-i18n="meta-classic">De klassieker — opnieuw gemaakt door AI</p>
+
+        <div class="game-explanation">
+            <h2 data-i18n="tetris-uitleg-title">📖 Uitleg</h2>
+            <p data-i18n="tetris-uitleg-p1">Tetris is een van de bekendste spellen ter wereld. Vallende blokken (tetromino's) moeten zo worden gedraaid en geplaatst dat ze volledige horizontale lijnen vormen.</p>
+
+            <h3 data-i18n="tetris-uitleg-h1">🎮 Besturing</h3>
+            <ul>
+                <li data-i18n="tetris-uitleg-h1i1">← → — Blok links/rechts verplaatsen</li>
+                <li data-i18n="tetris-uitleg-h1i2">↑ — Blok roteren</li>
+                <li data-i18n="tetris-uitleg-h1i3">↓ — Sneller laten vallen</li>
+                <li data-i18n="tetris-uitleg-h1i4">Spatie — Direct laten vallen</li>
+            </ul>
+
+            <h3 data-i18n="tetris-uitleg-h2">🧩 De blokken</h3>
+            <ul>
+                <li data-i18n="tetris-uitleg-h2i1">I-blok — 4 op een rij</li>
+                <li data-i18n="tetris-uitleg-h2i2">O-blok — vierkant 2×2</li>
+                <li data-i18n="tetris-uitleg-h2i3">T-blok — T-vorm</li>
+                <li data-i18n="tetris-uitleg-h2i4">J-blok — L-vorm (links)</li>
+                <li data-i18n="tetris-uitleg-h2i5">L-blok — L-vorm (rechts)</li>
+                <li data-i18n="tetris-uitleg-h2i6">S-blok — S-vorm</li>
+                <li data-i18n="tetris-uitleg-h2i7">Z-blok — Z-vorm</li>
+            </ul>
+
+            <h3 data-i18n="tetris-uitleg-h3">💡 Tip</h3>
+            <p data-i18n="tetris-uitleg-h3p">Probeer het bord zo vlak mogelijk te houden. Laat geen gaten vallen — die zijn later moeilijk op te vullen!</p>
+
+            <p style="margin-top: 16px; font-size: 0.85rem; color: var(--text-muted);" data-i18n="tetris-uitleg-footer">
+                🤖 Dit spel is gegenereerd door AI.
+            </p>
+        </div>
+
+        <div class="game-area" style="overflow:visible; padding:0; text-align:center;">
+            <iframe src="/static/games/tetris.html" style="width:100%;max-width:1100px;height:830px;border:none;margin:0 auto;min-width:800px;" title="Tetris" scrolling="auto"></iframe>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

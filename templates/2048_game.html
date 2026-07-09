@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}2048 — GamesFromAI{% endblock %}
+{% block content %}
+<section class=\"game-page\"> 
+  <div class=\"container\">
+    <h1>2048</h1>
+    <p class=\"game-meta\" data-i18n=\"meta-classic\">Klassieke puzzel — lokaal gegenereerd door AI</p>
+    <div class=\"game-area\" style=\"padding:0; text-align:center;\">
+      <iframe src=\"/static/games/2048.html\" style=\"width:100%;max-width:680px;height:520px;border:none;\" title=\"2048\"></iframe>
+    </div>
+  </div>
+</section>
+{% endblock %}

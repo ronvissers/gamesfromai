@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Zeeslag — GamesFromAI{% endblock %}
+{% block content %}
+
+<section class="game-page">
+    <div class="container">
+        <h1>🚢 <span data-i18n="card-zeeslag-title">Zeeslag</span></h1>
+        <p class="game-meta" data-i18n="meta-classic">De klassieker — opnieuw gemaakt door AI</p>
+
+        <div class="game-explanation">
+            <h2 data-i18n="zeeslag-uitleg-title">📖 Uitleg</h2>
+            <p data-i18n="zeeslag-uitleg-p1">Zeeslag (Battleship) is een klassiek strategiespel voor twee spelers. Jij tegen de computer. Plaats je schepen op het linker raster en probeer de schepen van de computer te vinden op het rechter raster.</p>
+
+            <h3 data-i18n="zeeslag-uitleg-h1">🎮 Hoe speel je?</h3>
+            <ul>
+                <li data-i18n="zeeslag-uitleg-h1i1"><strong>1. Plaatsen</strong> — Klik op het linker raster om je schepen te plaatsen. Spatie draait het schip.</li>
+                <li data-i18n="zeeslag-uitleg-h1i2"><strong>2. Mikken</strong> — Klik op het rechter raster (COMPUTER) om te vuren.</li>
+                <li data-i18n="zeeslag-uitleg-h1i3"><strong>3. Zinken</strong> — Raak alle vakjes van een schip om het te laten zinken.</li>
+                <li data-i18n="zeeslag-uitleg-h1i4"><strong>4. Winnen</strong> — Zink alle 5 schepen van de computer!</li>
+            </ul>
+
+            <h3 data-i18n="zeeslag-uitleg-h2">🎯 Besturing</h3>
+            <ul>
+                <li data-i18n="zeeslag-uitleg-h2i1">🖱️ Klik — Plaatsen / Vuren</li>
+                <li data-i18n="zeeslag-uitleg-h2i2">⌨️ Spatie — Schip draaien (tijdens plaatsen)</li>
+                <li data-i18n="zeeslag-uitleg-h2i3">⌨️ R — Nieuw spel</li>
+            </ul>
+
+            <h3 data-i18n="zeeslag-uitleg-h3">💡 Tip</h3>
+            <p data-i18n="zeeslag-uitleg-h3p">Begin met willekeurige schoten om het raster te verkennen. Zodra je een schip raakt, schiet dan op aangrenzende vakjes!</p>
+
+            <p style="margin-top: 16px; font-size: 0.85rem; color: var(--text-muted);" data-i18n="zeeslag-uitleg-footer">
+                🤖 Dit spel is gegenereerd door AI.
+            </p>
+        </div>
+
+        <div class="game-area" style="overflow:visible; padding:0; text-align:center;">
+            <iframe src="/static/games/zeeslag.html" style="width:100%;max-width:1100px;height:830px;border:none;margin:0 auto;min-width:800px;" title="Zeeslag" scrolling="auto"></iframe>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

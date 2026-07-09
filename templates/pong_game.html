@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Pong — GamesFromAI{% endblock %}
+{% block content %}
+<section class="game-page">
+  <div class="container">
+    <h1>Pong</h1>
+    <p class="game-meta">Korte, snelle Pong-demospel embedded op je lokale server.</p>
+    <div class="game-area" style="overflow:visible; padding:0; text-align:center;">
+      <iframe src="/static/games/pong.html" style="width:100%;max-width:900px;height:520px;border:none;margin:0 auto;min-width:600px;" title="Pong" scrolling="auto"></iframe>
+    </div>
+  </div>
+</section>
+{% endblock %}

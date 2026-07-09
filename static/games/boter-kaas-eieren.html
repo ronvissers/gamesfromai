@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boter, Kaas & Eieren</title>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-SD5W1E9K2L"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-SD5W1E9K2L');
+</script>
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #0f0f1a;
+    color: #e0e0e0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .container {
+    text-align: center;
+    padding: 1.5rem;
+  }
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    background: linear-gradient(135deg, #89C6FC, #6a9ef0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .subtitle {
+    color: #888;
+    margin-bottom: 1rem;
+    font-size: 0.85rem;
+  }
+  .scoreboard {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .score-item {
+    background: #1a1a2e;
+    padding: 0.4rem 0.8rem;
+    border-radius: 10px;
+    min-width: 70px;
+  }
+  .score-item .label { font-size: 0.65rem; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+  .score-item .value { font-size: 1.3rem; font-weight: 700; color: #89C6FC; }
+  .score-item.draw .value { color: #f0c040; }
+
+  .board {
+    display: grid;
+    grid-template-columns: repeat(3, 90px);
+    grid-template-rows: repeat(3, 90px);
+    gap: 5px;
+    background: #1a1a2e;
+    padding: 5px;
+    border-radius: 12px;
+    margin: 0 auto 1rem;
+    width: fit-content;
+  }
+  .cell {
+    width: 90px;
+    height: 90px;
+    background: #252540;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+  }
+  .cell:hover:not(.taken):not(.gameover) {
+    background: #30305a;
+    transform: scale(1.03);
+  }
+  .cell.taken, .cell.gameover { cursor: default; }
+  .cell.x { color: #89C6FC; }
+  .cell.o { color: #f08c6a; }
+  .cell.win {
+    background: #2a4a3a;
+    animation: pulse 0.6s ease infinite alternate;
+  }
+  @keyframes pulse {
+    from { box-shadow: 0 0 8px rgba(100, 220, 140, 0.2); }
+    to { box-shadow: 0 0 20px rgba(100, 220, 140, 0.5); }
+  }
+
+  .status {
+    font-size: 1.1rem;
+    margin-bottom: 0.8rem;
+    min-height: 1.8rem;
+    font-weight: 500;
+  }
+  .status.win { color: #64dc8c; }
+  .status.draw { color: #f0c040; }
+
+  .controls {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  button {
+    padding: 0.5rem 1.2rem;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    background: #1a1a2e;
+    color: #ccc;
+  }
+  button:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.2);
+  }
+  button.active {
+    background: #89C6FC;
+    color: #0f0f1a;
+  }
+  button.restart {
+    background: #2a4a3a;
+    color: #64dc8c;
+  }
+  button.restart:hover { background: #3a5a4a; }
+  .mode-select {
+    margin-bottom: 0.8rem;
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>○ Boter, Kaas & Eieren ✕</h1>
+  <p class="subtitle">Kies een modus en begin</p>
+
+  <div class="mode-select">
+    <button id="modePVP" class="active" data-mode="pvp">👥 Tegen elkaar</button>
+    <button id="modePVC" data-mode="pvc">🤖 Tegen computer</button>
+  </div>
+
+  <div class="scoreboard">
+    <div class="score-item"><div class="label">✕ Speler 1</div><div class="value" id="scoreX">0</div></div>
+    <div class="score-item draw"><div class="label">Gelijkspel</div><div class="value" id="scoreDraw">0</div></div>
+    <div class="score-item"><div class="label">○ Speler 2</div><div class="value" id="scoreO">0</div></div>
+  </div>
+
+  <div class="board" id="board">
+    <div class="cell" data-index="0"></div>
+    <div class="cell" data-index="1"></div>
+    <div class="cell" data-index="2"></div>
+    <div class="cell" data-index="3"></div>
+    <div class="cell" data-index="4"></div>
+    <div class="cell" data-index="5"></div>
+    <div class="cell" data-index="6"></div>
+    <div class="cell" data-index="7"></div>
+    <div class="cell" data-index="8"></div>
+  </div>
+
+  <div class="status" id="status">✕ Speler 1 is aan zet</div>
+
+  <div class="controls">
+    <button class="restart" id="restartBtn">↻ Opnieuw</button>
+  </div>
+</div>
+
+<script>
+// i18n voor het spel (leest taal uit localStorage — zelfde als parent site)
+const gameI18n = {
+  nl: {
+    title: "Boter, Kaas & Eieren",
+    subtitle: "Kies een modus en begin",
+    modePVP: "👥 Tegen elkaar",
+    modePVC: "🤖 Tegen computer",
+    scoreX: "✕ Speler 1",
+    scoreO: "○ Speler 2",
+    scoreDraw: "Gelijkspel",
+    turnSuffix: " is aan zet",
+    turnP1: "Speler 1",
+    turnP2: "Speler 2",
+    turnYourTurn: "Jij",
+    turnCompTurn: "Computer",
+    turnCompThink: "○ Computer denkt... 🤔",
+    winX: "✕ Speler 1 wint! 🎉",
+    winO: "○ Speler 2 wint! 🎉",
+    winYou: "Jij wint!",
+    winComp: "Computer wint!",
+    draw: "Gelijkspel! 🤝",
+    restart: "↻ Opnieuw",
+    startYou: "✕ Jij mag beginnen! 🎯",
+    startComp: "○ Computer begint, denkt na... 🤔",
+  },
+  en: {
+    title: "Tic-Tac-Toe",
+    subtitle: "Choose a mode and start playing",
+    modePVP: "👥 Two players",
+    modePVC: "🤖 Vs Computer",
+    scoreX: "✕ Player 1",
+    scoreO: "○ Player 2",
+    scoreDraw: "Draw",
+    turnSuffix: "'s turn",
+    turnP1: "Player 1",
+    turnP2: "Player 2",
+    turnYourTurn: "Your",
+    turnCompTurn: "Computer's",
+    turnCompThink: "○ Computer is thinking... 🤔",
+    winX: "✕ Player 1 wins! 🎉",
+    winO: "○ Player 2 wins! 🎉",
+    winYou: "You win!",
+    winComp: "Computer wins!",
+    draw: "It's a draw! 🤝",
+    restart: "↻ Restart",
+    startYou: "✕ You start! 🎯",
+    startComp: "○ Computer starts, thinking... 🤔",
+  }
+};
+
+function applyGameLang() {
+  const lang = localStorage.getItem('lang') || 'nl';
+  const t = gameI18n[lang] || gameI18n.nl;
+  document.title = t.title;
+  document.querySelector('h1').textContent = t.title;
+  document.querySelector('.subtitle').textContent = t.subtitle;
+  document.querySelector('[data-mode="pvp"]').textContent = t.modePVP;
+  document.querySelector('[data-mode="pvc"]').textContent = t.modePVC;
+  document.querySelector('.score-item:nth-child(1) .label').textContent = t.scoreX;
+  document.querySelector('.score-item:nth-child(2) .label').textContent = t.scoreDraw;
+  document.querySelector('.score-item:nth-child(3) .label').textContent = t.scoreO;
+  document.getElementById('restartBtn').textContent = t.restart;
+  // Update initiële status op basis van taal
+  const initialStatus = document.getElementById('status');
+  if (initialStatus.textContent.includes('Speler 1') || initialStatus.textContent.includes('Player 1') || initialStatus.textContent.includes('✕')) {
+    initialStatus.textContent = '✕ ' + t.turnP1 + (t.turnSuffix || ' is aan zet');
+  }
+  return t;
+}
+var _ = applyGameLang();
+
+// Listen for language changes from parent page (same localStorage key)
+window.addEventListener('storage', function(e) {
+  if (e.key === 'lang') { _ = applyGameLang(); }
+});
+
+// Listen for language changes from parent via postMessage
+window.addEventListener('message', function(e) {
+  if (e.data && e.data.type === 'lang-change') {
+    _ = applyGameLang();
+    // Re-apply current game state messages (use short labels, no prefix)
+    if (!gameOver) {
+      if (mode === 'pvc') {
+        const humanLabel = _.turnYourTurn || 'Jij';
+        const compLabel = _.turnCompTurn || 'Computer';
+        const name = currentPlayer === playerSymbol ? humanLabel : compLabel;
+        updateStatus(`${currentPlayer === 'X' ? '✕' : '○'} ${name}${_.turnSuffix}`);
+      } else {
+        const p1Label = _.turnP1 || 'Speler 1';
+        const p2Label = _.turnP2 || 'Speler 2';
+        const label = currentPlayer === 'X' ? p1Label : p2Label;
+        updateStatus(`${currentPlayer === 'X' ? '✕' : '○'} ${label}${_.turnSuffix}`);
+      }
+    }
+  }
+});
+</script>
+<script>
+const boardEl = document.getElementById('board');
+const cells = document.querySelectorAll('.cell');
+const statusEl = document.getElementById('status');
+const scoreXEl = document.getElementById('scoreX');
+const scoreOEl = document.getElementById('scoreO');
+const scoreDrawEl = document.getElementById('scoreDraw');
+const restartBtn = document.getElementById('restartBtn');
+const modePVP = document.getElementById('modePVP');
+const modePVC = document.getElementById('modePVC');
+
+let board = Array(9).fill(null);
+let currentPlayer = 'X';
+let gameOver = false;
+let mode = 'pvp';
+let scores = { X: 0, O: 0, draw: 0 };
+let playerSymbol = 'X';
+let aiSymbol = 'O';
+let aiThinking = false;
+let gameGen = 0;
+
+const winPatterns = [
+  [0,1,2],[3,4,5],[6,7,8],
+  [0,3,6],[1,4,7],[2,5,8],
+  [0,4,8],[2,4,6]
+];
+
+function getEmptyIndices(b) {
+  return b.map((v,i) => v === null ? i : null).filter(v => v !== null);
+}
+
+function checkWinner(b) {
+  for (const [a,bc,c] of winPatterns) {
+    if (b[a] && b[a] === b[bc] && b[a] === b[c]) return b[a];
+  }
+  return null;
+}
+
+function isBoardFull(b) {
+  return b.every(v => v !== null);
+}
+
+function minimax(b, depth, isMaximizing, alpha, beta) {
+  const winner = checkWinner(b);
+  if (winner === aiSymbol) return 10 - depth;
+  if (winner === playerSymbol) return depth - 10;
+  if (isBoardFull(b)) return 0;
+  const empties = getEmptyIndices(b);
+  if (isMaximizing) {
+    let best = -Infinity;
+    for (const i of empties) {
+      b[i] = aiSymbol;
+      best = Math.max(best, minimax(b, depth + 1, false, alpha, beta));
+      b[i] = null;
+      alpha = Math.max(alpha, best);
+      if (beta <= alpha) break;
+    }
+    return best;
+  } else {
+    let best = Infinity;
+    for (const i of empties) {
+      b[i] = playerSymbol;
+      best = Math.min(best, minimax(b, depth + 1, true, alpha, beta));
+      b[i] = null;
+      beta = Math.min(beta, best);
+      if (beta <= alpha) break;
+    }
+    return best;
+  }
+}
+
+function getBestMove() {
+  const boardCopy = [...board];
+  let bestScore = -Infinity;
+  let bestMove = null;
+  const empties = getEmptyIndices(boardCopy);
+  for (const i of empties) {
+    boardCopy[i] = aiSymbol;
+    const score = minimax(boardCopy, 0, false, -Infinity, Infinity);
+    boardCopy[i] = null;
+    if (score > bestScore) { bestScore = score; bestMove = i; }
+  }
+  return bestMove;
+}
+
+function renderBoard() {
+  cells.forEach((cell, i) => {
+    cell.textContent = board[i] || '';
+    cell.className = 'cell';
+    if (board[i]) cell.classList.add('taken', board[i].toLowerCase());
+    if (gameOver) cell.classList.add('gameover');
+  });
+}
+
+function highlightWinner(winner) {
+  for (const [a,b,c] of winPatterns) {
+    if (board[a] === winner && board[b] === winner && board[c] === winner) {
+      cells[a].classList.add('win');
+      cells[b].classList.add('win');
+      cells[c].classList.add('win');
+      break;
+    }
+  }
+}
+
+function updateStatus(msg, type) {
+  statusEl.textContent = msg;
+  statusEl.className = 'status' + (type ? ' ' + type : '');
+}
+
+function endGame(winner) {
+  gameOver = true;
+  if (winner === 'X') {
+    scores.X++; scoreXEl.textContent = scores.X;
+    if (mode === 'pvc') {
+      updateStatus(winner === playerSymbol ? '🎉 ' + (_.winYou || 'Jij wint!') : '💻 ' + (_.winComp || 'Computer wint!'), 'win');
+    } else {
+      updateStatus(_.winX || '✕ Speler 1 wint! 🎉', 'win');
+    }
+    highlightWinner('X');
+  } else if (winner === 'O') {
+    scores.O++; scoreOEl.textContent = scores.O;
+    if (mode === 'pvc') {
+      updateStatus(winner === playerSymbol ? '🎉 ' + (_.winYou || 'Jij wint!') : '💻 ' + (_.winComp || 'Computer wint!'), 'win');
+    } else {
+      updateStatus(_.winO || '○ Speler 2 wint! 🎉', 'win');
+    }
+    highlightWinner('O');
+  } else {
+    scores.draw++; scoreDrawEl.textContent = scores.draw;
+    updateStatus(_.draw || 'Gelijkspel! 🤝', 'draw');
+  }
+  renderBoard();
+}
+
+function switchPlayer() {
+  currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+  if (mode === 'pvc') {
+    const isHuman = currentPlayer === playerSymbol;
+    const name = isHuman ? (_.turnYourTurn || 'Jij') : (_.turnCompTurn || 'Computer');
+    updateStatus(`${currentPlayer === 'X' ? '✕' : '○'} ${name}${_.turnSuffix}`);
+  } else {
+    const label = currentPlayer === 'X' ? (_.turnP1 || 'Speler 1') : (_.turnP2 || 'Speler 2');
+    updateStatus(`${currentPlayer === 'X' ? '✕' : '○'} ${label}${_.turnSuffix}`);
+  }
+}
+
+function restartGame() {
+  gameGen++;
+  board = Array(9).fill(null);
+  gameOver = false;
+  aiThinking = false;
+  renderBoard();
+  cells.forEach(c => c.classList.remove('win', 'gameover'));
+  if (mode === 'pvc') {
+    const userStarts = Math.random() < 0.5;
+    playerSymbol = userStarts ? 'X' : 'O';
+    aiSymbol = userStarts ? 'O' : 'X';
+    currentPlayer = 'X';
+    if (userStarts) {
+      updateStatus(_.startYou || '✕ Jij mag beginnen! 🎯');
+    } else {
+      updateStatus(_.startComp || '○ Computer begint, denkt na... 🤔');
+      aiThinking = true;
+      setTimeout(doAiMove, 500);
+    }
+  } else {
+    currentPlayer = 'X';
+    playerSymbol = 'X'; aiSymbol = 'O';
+    updateStatus(_.turnP1 || '✕ Speler 1 ' + (_.turnSuffix || 'is aan zet'));
+  }
+}
+
+function checkGameState() {
+  const winner = checkWinner(board);
+  if (winner) { endGame(winner); return true; }
+  if (isBoardFull(board)) { endGame(null); return true; }
+  return false;
+}
+
+function makeMove(index) {
+  if (board[index] || gameOver || aiThinking) return;
+  if (mode === 'pvc' && currentPlayer !== playerSymbol) return;
+  board[index] = currentPlayer;
+  renderBoard();
+  if (checkGameState()) return;
+  switchPlayer();
+  if (mode === 'pvc' && currentPlayer === aiSymbol && !gameOver) {
+    aiThinking = true;
+    updateStatus(_.turnCompThink || '○ Computer denkt... 🤔');
+    setTimeout(doAiMove, 300);
+  }
+}
+
+function doAiMove() {
+  const myGen = gameGen;
+  if (gameOver) { aiThinking = false; return; }
+  const move = getBestMove();
+  if (myGen !== gameGen) { aiThinking = false; return; }
+  board[move] = aiSymbol;
+  renderBoard();
+  aiThinking = false;
+  if (checkGameState()) return;
+  if (myGen !== gameGen) return;
+  switchPlayer();
+}
+
+function restartGame() {
+  gameGen++;
+  board = Array(9).fill(null);
+  gameOver = false;
+  aiThinking = false;
+  renderBoard();
+  cells.forEach(c => c.classList.remove('win', 'gameover'));
+  if (mode === 'pvc') {
+    const userStarts = Math.random() < 0.5;
+    playerSymbol = userStarts ? 'X' : 'O';
+    aiSymbol = userStarts ? 'O' : 'X';
+    currentPlayer = 'X';
+    if (userStarts) {
+      updateStatus('✕ Jij mag beginnen! 🎯');
+    } else {
+      updateStatus('○ Computer begint, denkt na... 🤔');
+      aiThinking = true;
+      setTimeout(doAiMove, 500);
+    }
+  } else {
+    currentPlayer = 'X';
+    playerSymbol = 'X'; aiSymbol = 'O';
+    updateStatus('✕ Speler 1 is aan zet');
+  }
+}
+
+function setMode(newMode) {
+  mode = newMode;
+  modePVP.classList.toggle('active', mode === 'pvp');
+  modePVC.classList.toggle('active', mode === 'pvc');
+  scores = { X: 0, O: 0, draw: 0 };
+  scoreXEl.textContent = '0';
+  scoreOEl.textContent = '0';
+  scoreDrawEl.textContent = '0';
+  restartGame();
+}
+
+cells.forEach(cell => {
+  cell.addEventListener('click', () => makeMove(parseInt(cell.dataset.index)));
+});
+restartBtn.addEventListener('click', restartGame);
+modePVP.addEventListener('click', () => setMode('pvp'));
+modePVC.addEventListener('click', () => setMode('pvc'));
+restartGame();
+</script>
+</body>
+</html>

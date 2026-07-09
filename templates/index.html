@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}GamesFromAI{% endblock %}
+{% block content %}
+
+<section class="hero">
+    <h1 data-i18n="hero-title">Klassiekers, opnieuw gemaakt</h1>
+    <p><span data-i18n="hero-sub">Zeeslag, Space Invaders, Pocket Tank en Tetris — volledig opnieuw gebouwd door AI.</span><br>
+    <span data-i18n="hero-sub2">Geen unieke spellen, maar de tijdloze klassiekers die je kent, opnieuw tot leven gebracht.</span></p>
+    <a href="#games" class="btn" data-i18n="hero-cta">🎮 Bekijk de spellen</a>
+</section>
+
+<section class="about-section" id="about">
+    <div class="features-grid">
+        <div class="feature-item">
+            <div class="icon">🔄</div>
+            <h4 data-i18n="feat1-title">Klassiekers</h4>
+            <p data-i18n="feat1-desc">Bekende spellen, opnieuw gemaakt. Gewoon de beste klassiekers.</p>
+        </div>
+        <div class="feature-item">
+            <div class="icon">🤖</div>
+            <h4 data-i18n="feat2-title">Gemaakt door AI</h4>
+            <p data-i18n="feat2-desc">Elk spel is volledig gegenereerd met behulp van kunstmatige intelligentie.</p>
+        </div>
+        <div class="feature-item">
+            <div class="icon">📖</div>
+            <h4 data-i18n="feat3-title">Met uitleg</h4>
+            <p data-i18n="feat3-desc">Bij elk spel vind je een duidelijke uitleg over de regels en hoe je speelt.</p>
+        </div>
+    </div>
+</section>
+
+<section class="game-grid" id="games">
+    <a href="/zeeslag" class="game-card">
+        <span class="emoji">🚢</span>
+        <h3 data-i18n="card-zeeslag-title">Zeeslag</h3>
+        <p data-i18n="card-zeeslag-desc">Klassiek zeeslag op een raster van 10×10. Zoek en vernietig alle schepen van de tegenstander met strategisch mikken.</p>
+        <span class="tag" data-i18n="card-zeeslag-tag">Bordspel · Strategie</span>
+    </a>
+
+    <a href="/tank-game" class="game-card">
+        <span class="emoji">🪖</span>
+        <h3 data-i18n="card-tank-title">Pocket Tank</h3>
+        <p data-i18n="card-tank-desc">Twee tanks, één doel. Kies je wapen, mik en vuur in dit tactische artillerie-duel.</p>
+        <span class="tag" data-i18n="card-tank-tag">Strategie · Artillerie</span>
+    </a>
+
+    <a href="/tetris" class="game-card">
+        <span class="emoji">🧱</span>
+        <h3 data-i18n="card-tetris-title">Tetris</h3>
+        <p data-i18n="card-tetris-desc">De tijdloze puzzelklassieker. Draai en plaats vallende blokken om volledige lijnen te maken.</p>
+        <span class="tag" data-i18n="card-tetris-tag">Puzzel · Arcade</span>
+    </a>
+
+    <a href="/boter-kaas-eieren" class="game-card">
+        <span class="emoji">❌</span>
+        <h3 data-i18n="card-boter-title">Boter, Kaas & Eieren</h3>
+        <p data-i18n="card-boter-desc">Het klassieke bordspel met ✕ en ○. Speel tegen elkaar of tegen een onverslaanbare AI.</p>
+        <span class="tag" data-i18n="card-boter-tag">Bordspel · Twee spelers</span>
+    </a>
+
+    <a href="/space-invaders" class="game-card">
+        <span class="emoji">👾</span>
+        <h3 data-i18n="card-space-title">Space Invaders</h3>
+        <p data-i18n="card-space-desc">De klassieke arcade-shooter. Vernietig golven aliens en verdedig de aarde in dit tijdloze spel.</p>
+        <span class="tag" data-i18n="card-space-tag">Arcade · Shooter</span>
+    </a>
+</section>
+
+{% endblock %}
