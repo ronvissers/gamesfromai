@@ -182,5 +182,34 @@
 
         applyLanguage(currentLang);
     </script>
+    <script>
+        // === Fullscreen toggle voor games ===
+        function toggleFullscreen(btn) {
+            const container = btn.closest('.game-area');
+            if (!document.fullscreenElement) {
+                container.requestFullscreen().catch(err => {
+                    // Fallback voor oudere browsers
+                    if (container.webkitRequestFullscreen) container.webkitRequestFullscreen();
+                });
+                btn.innerHTML = '✕';
+                btn.title = 'Verlaat volledig scherm';
+            } else {
+                document.exitFullscreen();
+                btn.innerHTML = '⛶';
+                btn.title = 'Volledig scherm';
+            }
+        }
+
+        // Update button when exiting fullscreen via Escape
+        document.addEventListener('fullscreenchange', () => {
+            const btn = document.querySelector('.fullscreen-btn');
+            if (btn) {
+                if (!document.fullscreenElement) {
+                    btn.innerHTML = '⛶';
+                    btn.title = 'Volledig scherm';
+                }
+            }
+        });
+    </script>
 </body>
 </html>
