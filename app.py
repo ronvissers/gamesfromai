@@ -34,6 +34,10 @@ def game2048():
 def space_invaders():
     return render_template('space_invaders.html')
 
+@app.route('/schaken')
+def chess():
+    return render_template('chess_game.html')
+
 @app.route('/cookiebeleid')
 def cookiebeleid():
     return render_template('cookiebeleid.html')
@@ -49,6 +53,7 @@ def sitemap():
         ('/2048', '2026-07-09', '0.9'),
         ('/boter-kaas-eieren', '2026-07-05', '0.9'),
         ('/space-invaders', '2026-07-07', '0.9'),
+        ('/schaken', '2026-07-17', '0.9'),
         ('/cookiebeleid', '2026-07-05', '0.5'),
     ]
     xml = '<?xml version="1.0" encoding="UTF-8"?>\n'

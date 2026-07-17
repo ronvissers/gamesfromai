@@ -106,6 +106,9 @@
                 <li class="divider"></li>
                 <li><span class="dropdown-label">🪖 <span data-i18n="cat-strategie">Strategie</span></span></li>
                 <li><a href="/tank-game" data-i18n="nav-tank">🪖 Pocket Tank</a></li>
+                <li class="divider"></li>
+                <li><span class="dropdown-label">♟️ <span data-i18n="cat-bordspel">Bordspel</span></span></li>
+                <li><a href="/schaken" data-i18n="nav-chess">♟️ Schaken</a></li>
             </ul>
         </div>
     </nav>
@@ -184,7 +187,7 @@
             // Stuur taal door naar iframes (game spellen)
             document.querySelectorAll('iframe').forEach(iframe => {
                 if (iframe.contentWindow) {
-                    iframe.contentWindow.postMessage({ type: 'lang-change' }, '*');
+                    iframe.contentWindow.postMessage({ type: 'lang-change', lang: lang }, '*');
                 }
             });
 

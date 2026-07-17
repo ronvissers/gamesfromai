@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Schaken — GamesFromAI{% endblock %}
+{% block meta_desc %}Speel schaken — de klassieker! Tegen de computer of met z'n tweeën. Volledig schaakspel met AI.{% endblock %}
+{% block og_title %}♟️ Schaken — Speel online!{% endblock %}
+{% block og_desc %}Schaken — het tijdloze bordspel, opnieuw gebouwd door AI. Speel tegen de computer of tegen een vriend!{% endblock %}
+{% block tw_title %}Schaken — GamesFromAI{% endblock %}
+{% block tw_desc %}Speel schaken tegen AI of met z'n tweeën.{% endblock %}
+
+{% block content %}
+
+<script>
+// Set iframe language from localStorage before it loads
+(function(){
+    const lang = localStorage.getItem('lang') || 'nl';
+    const iframe = document.getElementById('chess-iframe');
+    if(iframe) iframe.src = '/static/games/chess.html?lang=' + lang;
+})();
+</script>
+
+<section class="game-page">
+    <div class="container">
+        <h1 data-i18n="chess-title">♟️ Schaken</h1>
+        <p class="game-meta" data-i18n="meta-classic">De klassieker — opnieuw gemaakt door AI</p>
+
+        <!-- Uitleg BOVEN het spel -->
+        <div class="game-explanation">
+            <h2 data-i18n="chess-uitleg-title">📖 Uitleg</h2>
+            <p data-i18n="chess-uitleg-p1">Schaken is een van de oudste en meest strategische bordspellen ter wereld. Twee spelers verplaatsen om de beurt stukken op een bord van 8×8. Het doel is om de koning van de tegenstander schaakmat te zetten.</p>
+
+            <h3 data-i18n="chess-uitleg-h1">♟️ De stukken</h3>
+            <ul>
+                <li data-i18n="chess-uitleg-h1i1"><strong>👑 Koning</strong> — 1 veld alle kanten. Het belangrijkste stuk — verlies hem en je verliest!</li>
+                <li data-i18n="chess-uitleg-h1i2"><strong>👸 Dame</strong> — onbeperkt recht, diagonaal en horizontaal. Het krachtigste stuk.</li>
+                <li data-i18n="chess-uitleg-h1i3"><strong>🏰 Toren</strong> — onbeperkt recht (horizontaal/verticaal).</li>
+                <li data-i18n="chess-uitleg-h1i4"><strong>🧙 Loper</strong> — onbeperkt diagonaal, blijft op dezelfde kleur.</li>
+                <li data-i18n="chess-uitleg-h1i5"><strong>🐴 Paard</strong> — L-vorm (2+1). Kan over andere stukken springen.</li>
+                <li data-i18n="chess-uitleg-h1i6"><strong>⚪ Pion</strong> — 1 vooruit, slaat diagonaal. Promoveert bij de overkant.</li>
+            </ul>
+
+            <h3 data-i18n="chess-uitleg-h2">🎮 Bijzondere regels</h3>
+            <ul>
+                <li data-i18n="chess-uitleg-h2i1"><strong>Rokade</strong> — Koning 2 velden opzij, toren springt eroverheen. Alleen als beide nog niet bewogen zijn en er geen stukken tussen staan.</li>
+                <li data-i18n="chess-uitleg-h2i2"><strong>En passant</strong> — Sla een pion die 2 velden vooruit is gegaan alsof hij maar 1 is gegaan.</li>
+                <li data-i18n="chess-uitleg-h2i3"><strong>Promotie</strong> — Haal een pion naar de overkant en kies een dame, toren, loper of paard.</li>
+            </ul>
+
+            <h3 data-i18n="chess-uitleg-h3">💡 Tip</h3>
+            <p data-i18n="chess-uitleg-h3p">Beheers het centrum! Ontwikkel je paarden en lopers vroeg in het spel. Rokade beschermt je koning. Hoe meer stukken je aanvalt, hoe meer kans je maakt.</p>
+            <p style="margin-top: 16px; font-size: 0.85rem; color: var(--text-muted);" data-i18n="chess-uitleg-footer">
+                🤖 Dit spel is gegenereerd door AI.
+            </p>
+        </div>
+
+        <!-- Game full-width eronder -->
+        <div class="game-area" style="position:relative;margin-top:24px;overflow:hidden;padding:0;text-align:center;">
+            <button class="fullscreen-btn" onclick="toggleFullscreen(this)" title="Volledig scherm">⛶</button>
+            <iframe id="chess-iframe" src="/static/games/chess.html"
+                    style="width:100%;max-width:800px;height:700px;border:none;margin:0 auto;min-width:600px;"
+                    title="Schaken" scrolling="auto"></iframe>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

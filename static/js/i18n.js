@@ -14,6 +14,7 @@ const i18n = {
         "nav-space": "👾 Space Invaders",
         "nav-snake": "🐍 Snake",
         "nav-2048": "🔢 2048",
+        "nav-chess": "♟️ Schaken",
 
         // Categories
         "cat-all": "🎮 Alle",
@@ -64,6 +65,11 @@ const i18n = {
         "card-2048-title": "🔢 2048",
         "card-2048-desc": "Schuif tegels, combineer ze en probeer de 2048 tegel te bereiken!",
         "card-2048-tag": "Puzzel · Cijfers",
+
+        // Chess card
+        "card-chess-title": "♟️ Schaken",
+        "card-chess-desc": "Het ultieme strategiespel. Zet je tegenstander schaakmat met koning, dame, toren en paard.",
+        "card-chess-tag": "Bordspel · Strategie",
 
         // Game pages - meta
         "meta-classic": "De klassieker — opnieuw gemaakt door AI",
@@ -160,6 +166,25 @@ const i18n = {
         // Game controls
         "btn-new-game": "Nieuw spel",
         "btn-new-round": "Nieuwe ronde",
+
+        // Chess explanation
+        "chess-title": "♟️ Schaken",
+        "chess-uitleg-title": "📖 Uitleg",
+        "chess-uitleg-p1": "Schaken is een van de oudste en meest strategische bordspellen ter wereld. Twee spelers verplaatsen om de beurt stukken op een bord van 8×8. Het doel is om de koning van de tegenstander schaakmat te zetten.",
+        "chess-uitleg-h1": "♟️ De stukken",
+        "chess-uitleg-h1i1": "<strong>👑 Koning</strong> — 1 veld alle kanten. Het belangrijkste stuk — verlies hem en je verliest!",
+        "chess-uitleg-h1i2": "<strong>👸 Dame</strong> — onbeperkt recht, diagonaal en horizontaal. Het krachtigste stuk.",
+        "chess-uitleg-h1i3": "<strong>🏰 Toren</strong> — onbeperkt recht (horizontaal/verticaal).",
+        "chess-uitleg-h1i4": "<strong>🧙 Loper</strong> — onbeperkt diagonaal, blijft op dezelfde kleur.",
+        "chess-uitleg-h1i5": "<strong>🐴 Paard</strong> — L-vorm (2+1). Kan over andere stukken springen.",
+        "chess-uitleg-h1i6": "<strong>⚪ Pion</strong> — 1 vooruit, slaat diagonaal. Promoveert bij de overkant.",
+        "chess-uitleg-h2": "🎮 Bijzondere regels",
+        "chess-uitleg-h2i1": "<strong>Rokade</strong> — Koning 2 velden opzij, toren springt eroverheen. Alleen als beide nog niet bewogen zijn en er geen stukken tussen staan.",
+        "chess-uitleg-h2i2": "<strong>En passant</strong> — Sla een pion die 2 velden vooruit is gegaan alsof hij maar 1 is gegaan.",
+        "chess-uitleg-h2i3": "<strong>Promotie</strong> — Haal een pion naar de overkant en kies een dame, toren, loper of paard.",
+        "chess-uitleg-h3": "💡 Tip",
+        "chess-uitleg-h3p": "Beheers het centrum! Ontwikkel je paarden en lopers vroeg in het spel. Rokade beschermt je koning. Hoe meer stukken je aanvalt, hoe meer kans je maakt.",
+        "chess-uitleg-footer": "🤖 Dit spel is gegenereerd door AI.",
         
         // Tetris labels
         "tetris-score-label": "Score",
@@ -212,6 +237,7 @@ const i18n = {
         "nav-space": "👾 Space Invaders",
         "nav-snake": "🐍 Snake",
         "nav-2048": "🔢 2048",
+        "nav-chess": "♟️ Chess",
 
         // Categories
         "cat-all": "🎮 All",
@@ -262,6 +288,11 @@ const i18n = {
         "card-2048-title": "🔢 2048",
         "card-2048-desc": "Slide tiles, combine them and try to reach the 2048 tile!",
         "card-2048-tag": "Puzzle · Numbers",
+
+        // Chess card
+        "card-chess-title": "♟️ Chess",
+        "card-chess-desc": "The ultimate strategy game. Checkmate your opponent with king, queen, rook and knight.",
+        "card-chess-tag": "Board Game · Strategy",
 
         // Game pages - meta
         "meta-classic": "The classic — rebuilt by AI",
@@ -358,6 +389,25 @@ const i18n = {
         // Game controls
         "btn-new-game": "New Game",
         "btn-new-round": "New Round",
+
+        // Chess explanation
+        "chess-title": "♟️ Chess",
+        "chess-uitleg-title": "📖 How to Play",
+        "chess-uitleg-p1": "Chess is one of the oldest and most strategic board games in the world. Two players take turns moving pieces on an 8×8 board. The goal is to checkmate the opponent's king.",
+        "chess-uitleg-h1": "♟️ The Pieces",
+        "chess-uitleg-h1i1": "<strong>👑 King</strong> — 1 square in any direction. The most important piece — lose him and you lose!",
+        "chess-uitleg-h1i2": "<strong>👸 Queen</strong> — unlimited straight, diagonal and horizontal. The most powerful piece.",
+        "chess-uitleg-h1i3": "<strong>🏰 Rook</strong> — unlimited straight (horizontal/vertical).",
+        "chess-uitleg-h1i4": "<strong>🧙 Bishop</strong> — unlimited diagonal, stays on the same color.",
+        "chess-uitleg-h1i5": "<strong>🐴 Knight</strong> — L-shape (2+1). Can jump over other pieces.",
+        "chess-uitleg-h1i6": "<strong>⚪ Pawn</strong> — 1 forward, captures diagonally. Promotes at the far rank.",
+        "chess-uitleg-h2": "🎮 Special Rules",
+        "chess-uitleg-h2i1": "<strong>Castling</strong> — Move the king 2 squares sideways, the rook jumps over. Only if neither has moved with no pieces in between.",
+        "chess-uitleg-h2i2": "<strong>En passant</strong> — Capture a pawn that moved 2 squares forward as if it only moved 1.",
+        "chess-uitleg-h2i3": "<strong>Promotion</strong> — Get a pawn to the far rank and choose a queen, rook, bishop or knight.",
+        "chess-uitleg-h3": "💡 Tip",
+        "chess-uitleg-h3p": "Control the center! Develop your knights and bishops early in the game. Castling protects your king. The more pieces you attack with, the better your chances.",
+        "chess-uitleg-footer": "🤖 This game was generated by AI.",
         
         // Tetris labels
         "tetris-score-label": "Score",
